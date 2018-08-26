@@ -8,8 +8,14 @@ import (
 )
 
 func main() {
-	ctx := app.New("config.yaml")
-	router := newAppRouter(ctx)
+	a := app.New("config.yaml")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	a.RegisterRouter(func(ctx *app.Context) http.Handler {
+		return newAppRouter(ctx)
+	})
+	//r := newAppRouter(ctx)
+
+	if err := a.Serve(); err != nil {
+		log.Fatal(err)
+	}
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/sedind/flow/features/auth"
 )
 
-func newAppRouter(ctx *app.Context) *router.Mux {
+func newAppRouter(ctx *app.Context) http.Handler {
 	appRouter := router.New()
 
 	if ctx.PanicRecover {
@@ -31,6 +31,10 @@ func newAppRouter(ctx *app.Context) *router.Mux {
 	if ctx.CompressResponse {
 		// Compress response body
 		appRouter.Use(middleware.DefaultCompress)
+	}
+	if ctx.NoCache {
+		// send no-cache headers
+		appRouter.Use(middleware.NoCache)
 	}
 
 	// mount application routes

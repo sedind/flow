@@ -1,8 +1,10 @@
 name: Flow CMS - REST API
+addr: 0.0.0.0:3000
 request_logging: true
 compress_response: true
 redirect_slashes: true
 panic_recover: true
+no_cache: true
 cors:
   allowed_origins: 
     - "*"
