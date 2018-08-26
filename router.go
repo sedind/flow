@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/sedind/flow/app/middleware/cors"
+
 	"github.com/sedind/flow/app"
 	"github.com/sedind/flow/app/middleware"
 	"github.com/sedind/flow/app/router"
@@ -36,6 +38,17 @@ func newAppRouter(ctx *app.Context) http.Handler {
 		// send no-cache headers
 		r.Use(middleware.NoCache)
 	}
+
+	// Basic CORS
+	cors := cors.New(cors.Options{
+		AllowedOrigins:   ctx.CORS.AllowedOrigins,
+		AllowedMethods:   ctx.CORS.AllowedMethods,
+		AllowedHeaders:   ctx.CORS.AllowedHeaders,
+		ExposedHeaders:   ctx.CORS.ExposedHeaders,
+		AllowCredentials: ctx.CORS.AllowCredentials,
+		MaxAge:           ctx.CORS.MaxAge,
+	})
+	r.Use(cors.Handler)
 
 	// mount application routes
 	r.Route("/v1", func(r router.Router) {
