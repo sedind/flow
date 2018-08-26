@@ -11,34 +11,34 @@ import (
 )
 
 func newAppRouter(ctx *app.Context) http.Handler {
-	appRouter := router.New()
+	r := router.New()
 
 	if ctx.PanicRecover {
 		// Recover from panics without crashing server
-		appRouter.Use(middleware.Recoverer)
+		r.Use(middleware.Recoverer)
 	}
 
 	if ctx.RedirectSlashes {
 		//Redirect slashes to no slash URL version
-		appRouter.Use(middleware.RedirectSlashes)
+		r.Use(middleware.RedirectSlashes)
 	}
 
 	if ctx.RequestLogging {
 		// log API request calls
-		appRouter.Use(middleware.Logger)
+		r.Use(middleware.Logger)
 	}
 
 	if ctx.CompressResponse {
 		// Compress response body
-		appRouter.Use(middleware.DefaultCompress)
+		r.Use(middleware.DefaultCompress)
 	}
 	if ctx.NoCache {
 		// send no-cache headers
-		appRouter.Use(middleware.NoCache)
+		r.Use(middleware.NoCache)
 	}
 
 	// mount application routes
-	appRouter.Route("/v1", func(r router.Router) {
+	r.Route("/v1", func(r router.Router) {
 		r.Mount("/auth", auth.New(ctx).Routes())
 	})
 
@@ -48,9 +48,9 @@ func newAppRouter(ctx *app.Context) http.Handler {
 		return nil
 	}
 
-	if err := router.Walk(appRouter, walkFunc); err != nil {
+	if err := router.Walk(r, walkFunc); err != nil {
 		log.Panicf("Logging err: %s\n", err.Error()) // panic if there is an error
 	}
 
-	return appRouter
+	return r
 }
