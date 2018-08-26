@@ -50,9 +50,25 @@ func newAppRouter(ctx *app.Context) http.Handler {
 	})
 	r.Use(cors.Handler)
 
-	// mount application routes
-	r.Route("/v1", func(r router.Router) {
-		r.Mount("/auth", auth.New(ctx).Routes())
+	auth := auth.New(ctx)
+
+	//public application routes
+	r.Group(func(r router.Router) {
+		r.Mount("/auth", auth.Routes())
+	})
+
+	//protected application routes
+	r.Group(func(r router.Router) {
+		// Seek, verify and validate JWT tokens
+		r.Use(auth.JWTVerifierHandler())
+
+		// Handle valid / invalid tokens. In this example, we use
+		// the provided authenticator middleware, but you can write your
+		// own very easily, look at the Authenticator method in jwtauth.go
+		// and tweak it, its not scary.
+		r.Use(auth.JWTAuthenticatorMiddleware)
+		r.Mount("/test", auth.Routes())
+
 	})
 
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
