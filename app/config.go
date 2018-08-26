@@ -6,14 +6,15 @@ import (
 
 // Config -
 type Config struct {
-	Name             string            `yaml:"name"`
-	RequestLogging   bool              `yaml:"request_logging"`
-	CompressResponse bool              `yaml:"compress_response"`
-	RedirectSlashes  bool              `yaml:"redirect_slashes"`
-	PanicRecover     bool              `yaml:"panic_recover"`
-	CORS             CORSConfig        `yaml:"cors"`
-	DB               dbe.Details       `yaml:"db"`
-	AppSettings      map[string]string `yaml:"app_settings"`
+	Name              string                 `yaml:"name"`
+	RequestLogging    bool                   `yaml:"request_logging"`
+	CompressResponse  bool                   `yaml:"compress_response"`
+	RedirectSlashes   bool                   `yaml:"redirect_slashes"`
+	PanicRecover      bool                   `yaml:"panic_recover"`
+	CORS              CORSConfig             `yaml:"cors"`
+	DefaultConnection string                 `yaml:"default_connection"`
+	ConnectionStrings map[string]dbe.Details `yaml:"connection_strings"`
+	AppSettings       map[string]string      `yaml:"app_settings"`
 }
 
 // CORSConfig -

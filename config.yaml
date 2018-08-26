@@ -21,19 +21,20 @@ cors:
     - Link
   allow_credentials: true
   max_age: 300
-
-db:
-  url: {{envOr "DB_URL", "mysql://root:root@(localhost:3306)/flow_db?parseTime=true&multiStatements=true&readTimeout=1s"}}
-  dialect: "mysql"
-  database: "flow_dev"
-  host: "localhost"
-  port: "3306"
-  user: "root"
-  password: "root"
-  Pool: 0
-  IdlePool: 0
-  Options: 
-    key: value
+default_connection: default
+connection_strings:
+  default:
+    url: {{envOr "DB_URL" "mysql://root1:root1@(localhost:3306)/flow_dev1?parseTime=true&multiStatements=true&readTimeout=1s"}}
+    dialect: "mysql"
+    database: "flow_dev"
+    host: "localhost"
+    port: "3306"
+    user: "root"
+    password: "root"
+    Pool: 0
+    IdlePool: 0
+    Options: 
+      key: value
   
 app_settings:
   GitHubClientID: 8d5d88778095720834ba

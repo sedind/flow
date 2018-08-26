@@ -77,10 +77,6 @@ func (d *Details) Finalize() error {
 		d.Dialect = "postgres"
 		d.Port = defaults.String(d.Port, "5432")
 		d.Database = strings.TrimPrefix(d.Database, "/")
-	case "cockroach", "cockroachdb", "crdb":
-		d.Dialect = "cockroach"
-		d.Port = defaults.String(d.Port, "26257")
-		d.Database = strings.TrimPrefix(d.Database, "/")
 	case "mysql":
 		if d.URL != "" {
 			cfg, err := _mysql.ParseDSN(strings.TrimPrefix(d.URL, "mysql://"))
@@ -128,7 +124,7 @@ func (d *Details) RetrySleep() time.Duration {
 
 // RetryLimit returns the maximum number of accepted connection retries
 func (d *Details) RetryLimit() int {
-	i, err := strconv.Atoi(defaults.String(d.Options["_retry_limit"], "1000"))
+	i, err := strconv.Atoi(defaults.String(d.Options["retry_limit"], "1000"))
 	if err != nil {
 		return 100
 	}
