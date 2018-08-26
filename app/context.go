@@ -14,14 +14,6 @@ type Context struct {
 	Config
 }
 
-// ConnectionString gets connection string for given key
-func (c *Context) ConnectionString(key string) string {
-	if val, ok := c.ConnectionStrings[key]; ok {
-		return val
-	}
-	return ""
-}
-
 // AppSetting gets appSetting string for given key
 func (c *Context) AppSetting(key string) string {
 	if val, ok := c.AppSettings[key]; ok {
