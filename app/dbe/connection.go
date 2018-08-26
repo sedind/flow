@@ -12,13 +12,12 @@ import (
 // talking with a datastore
 type Connection struct {
 	ID      string
-	Store   *sql.DB
 	Dialect Dialect
 }
 
 // NewConnection creates a new connection, and sets it's `Dialect`
 // appropriately based on the `ConnectionDetails` passed into it.
-func NewConnection(details Details) (*Connection, error) {
+func NewConnection(details *Details) (*Connection, error) {
 	err := details.Finalize()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -34,32 +33,26 @@ func NewConnection(details Details) (*Connection, error) {
 	}
 	c.Dialect = dialect
 
-	return c, nil
-}
-
-// Open creates a new datasource connection
-func (c *Connection) Open() error {
-	if c.Store != nil {
-		return nil
-	}
-	db, err := sql.Open(c.Dialect.Name(), c.Dialect.URL())
+	dbc, err := sql.Open(c.Dialect.Name(), c.Dialect.URL())
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
-	if err := db.Ping(); err != nil {
-		db.Close()
-		return errors.WithStack(err)
+	if err := dbc.Ping(); err != nil {
+		dbc.Close()
+		return nil, errors.WithStack(err)
 	}
 
-	db.SetMaxOpenConns(c.Dialect.Details().Pool)
-	db.SetMaxIdleConns(c.Dialect.Details().IdlePool)
+	dbc.SetMaxOpenConns(c.Dialect.Details().Pool)
+	dbc.SetMaxIdleConns(c.Dialect.Details().IdlePool)
 
-	c.Store = db
-	return nil
+	store := &DB{dbc}
+	c.Dialect.SetStore(store)
+
+	return c, nil
 }
 
 // Close destroys an active datasource connection
 func (c *Connection) Close() error {
-	return errors.Wrap(c.Store.Close(), "could not close connection")
+	return errors.Wrap(c.Dialect.Store().Close(), "could not close connection")
 }

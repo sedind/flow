@@ -15,28 +15,16 @@ import (
 
 // Details represents data needed to connect to a datasource
 type Details struct {
-	// Example: "postgres" or "sqlite3" or "mysql"
-	Dialect string
-	// The name of your database. Example: "foo_development"
-	Database string
-	// The host of your database. Example: "127.0.0.1"
-	Host string
-	// The port of your database. Example: 1234
-	// Will default to the "default" port for each dialect.
-	Port string
-	// The username of the database user. Example: "root"
-	User string
-	// The password of the database user. Example: "password"
-	Password string
-	// Instead of specifying each individual piece of the
-	// connection you can instead just specify the URL of the
-	// database. Example: "postgres://postgres:postgres@localhost:5432/pop_test?sslmode=disable"
-	URL string
-	// Defaults to 0 "unlimited". See https://golang.org/pkg/database/sql/#DB.SetMaxOpenConns
-	Pool int
-	// Defaults to 0 "unlimited". See https://golang.org/pkg/database/sql/#DB.SetMaxIdleConns
-	IdlePool int
-	Options  map[string]string
+	Dialect  string            `yaml:"dialect"`
+	Database string            `yaml:"database"`
+	Host     string            `yaml:"host"`
+	Port     string            `yaml:"port"`
+	User     string            `yaml:"user"`
+	Password string            `yaml:"password"`
+	URL      string            `yaml:"url"`
+	Pool     int               `yaml:"pool"`
+	IdlePool int               `yaml:"idle_pool"`
+	Options  map[string]string `yaml:"options"`
 }
 
 var dialectRegex = regexp.MustCompile(`\s+:\/\/`)

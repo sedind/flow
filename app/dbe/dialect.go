@@ -1,27 +1,23 @@
 package dbe
 
-import (
-	"database/sql"
-	"fmt"
-	"reflect"
-)
+import "github.com/pkg/errors"
 
 // Dialect interface contains behaviors that differ across SQL database
 type Dialect interface {
 	// Name - returns dialect's name
 	Name() string
 
-	// SetDetails - sets connection details
-	SetDetails(details Details)
+	// SetStore - sets DB store for dialect
+	SetStore(store Store)
 
-	// Details - returns connection details
-	Details() Details
+	// Store returns store object
+	Store() Store
 
-	// URL - returns conenction string URL
+	// URS connection URL
 	URL() string
 
-	// SetStore - sets DB store for dialect
-	SetStore(store *sql.DB)
+	//Details gets connection details
+	Details() Details
 
 	// BindVar return the placeholder for actual values in SQL statements, in many dbs it is "?", Postgres using $1
 	BindVar(i int) string
@@ -35,7 +31,7 @@ type Dialect interface {
 	// HasForeignKey - check has foreign key or not
 	HasForeignKey(tableName string, foreignKeyName string) bool
 
-	// Remove index
+	// RemoveIndex - removes index from table
 	RemoveIndex(tableName string, indexName string) error
 
 	// HasTable - check has table or not
@@ -66,20 +62,15 @@ type Dialect interface {
 	Lock(func() error) error
 }
 
-var dialectsMap = map[string]Dialect{}
+func newDialect(details *Details) (Dialect, error) {
+	switch details.Dialect {
+	case "mysql":
+		return &DialectMySQL{
+			DialectCommon: DialectCommon{
+				details: *details,
+			},
+		}, nil
 
-func newDialect(details Details) (Dialect, error) {
-	if val, ok := dialectsMap[details.Dialect]; ok {
-		dialect := reflect.New(reflect.TypeOf(val).Elem()).Interface().(Dialect)
-		dialect.SetDetails(details)
-		return dialect, nil
 	}
-
-	err := fmt.Errorf("'%s' dialect is not supported", details.Dialect)
-	return nil, err
-}
-
-// RegisterDialect - registers new dialect
-func RegisterDialect(name string, dialect Dialect) {
-	dialectsMap[name] = dialect
+	return nil, errors.Errorf("unsupported dialect %s", details.Dialect)
 }

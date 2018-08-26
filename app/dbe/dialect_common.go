@@ -1,7 +1,6 @@
 package dbe
 
 import (
-	"database/sql"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -13,88 +12,86 @@ import (
 type DefaultForeignKeyNamer struct {
 }
 
-type commonDialect struct {
-	store   *sql.DB
+//DialectCommon  implements common dialect operations
+type DialectCommon struct {
+	store   Store
 	details Details
 	DefaultForeignKeyNamer
 }
 
-func init() {
-	RegisterDialect("common", &commonDialect{})
-}
-
-func (commonDialect) Name() string {
+// Name returns dialect name
+func (dc *DialectCommon) Name() string {
 	return "common"
 }
 
-// SetDetails - sets connection details
-func (c commonDialect) SetDetails(details Details) {
-	c.details = details
+// SetStore sets dialect DB store
+func (dc *DialectCommon) SetStore(store Store) {
+	dc.store = store
 }
 
-// Details - returns connection details
-func (c commonDialect) Details() Details {
-	return c.details
+// Store returns store instance
+func (dc *DialectCommon) Store() Store {
+	return dc.store
 }
 
-// URL - returns conenction string URL
-func (c commonDialect) URL() string {
-	return ""
+//Details gets connection details
+func (dc *DialectCommon) Details() Details {
+	return dc.details
 }
 
-func (c commonDialect) SetStore(store *sql.DB) {
-	c.store = store
-}
-
-func (commonDialect) BindVar(i int) string {
+// BindVar return the placeholder for actual values in SQL statements, in many dbs it is "?", Postgres using $1
+func (dc *DialectCommon) BindVar(i int) string {
 	return "$$$" // ?
 }
 
-func (commonDialect) Quote(key string) string {
+// Quote - quotes field name to avoid SQL parsing excwptions by using reserved words as a field name
+func (dc *DialectCommon) Quote(key string) string {
 	return fmt.Sprintf(`"%s"`, key)
 }
 
-func (c commonDialect) HasIndex(tableName string, indexName string) bool {
+// HasIndex check has index or not
+func (dc *DialectCommon) HasIndex(tableName string, indexName string) bool {
 	var count int
-	currentDatabase, tableName := c.currentDatabaseAndTable(tableName)
-	c.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = ? AND table_name = ? AND index_name = ?", currentDatabase, tableName, indexName).Scan(&count)
+	currentDatabase, tableName := dc.currentDatabaseAndTable(tableName)
+	dc.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = ? AND table_name = ? AND index_name = ?", currentDatabase, tableName, indexName).Scan(&count)
 	return count > 0
 }
 
-func (c commonDialect) RemoveIndex(tableName string, indexName string) error {
-	_, err := c.store.Exec(fmt.Sprintf("DROP INDEX %v", indexName))
-	return err
-}
-
-func (c commonDialect) HasForeignKey(tableName string, foreignKeyName string) bool {
+// HasForeignKey - check has foreign key or not
+func (dc *DialectCommon) HasForeignKey(tableName string, foreignKeyName string) bool {
 	return false
 }
 
-func (c commonDialect) HasTable(tableName string) bool {
-	var count int
-	currentDatabase, tableName := c.currentDatabaseAndTable(tableName)
-	c.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = ? AND table_name = ?", currentDatabase, tableName).Scan(&count)
-	return count > 0
-}
-
-func (c commonDialect) HasColumn(tableName string, columnName string) bool {
-	var count int
-	currentDatabase, tableName := c.currentDatabaseAndTable(tableName)
-	c.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = ? AND table_name = ? AND column_name = ?", currentDatabase, tableName, columnName).Scan(&count)
-	return count > 0
-}
-
-func (c commonDialect) ModifyColumn(tableName string, columnName string, typ string) error {
-	_, err := c.store.Exec(fmt.Sprintf("ALTER TABLE %v ALTER COLUMN %v TYPE %v", tableName, columnName, typ))
+// RemoveIndex - removes index from table
+func (dc *DialectCommon) RemoveIndex(tableName string, indexName string) error {
+	_, err := dc.store.Exec(fmt.Sprintf("DROP INDEX %v", indexName))
 	return err
 }
 
-func (c commonDialect) CurrentDatabase() (name string) {
-	c.store.QueryRow("SELECT DATABASE()").Scan(&name)
-	return
+// HasTable - check has table or not
+func (dc *DialectCommon) HasTable(tableName string) bool {
+	var count int
+	currentDatabase, tableName := dc.currentDatabaseAndTable(tableName)
+	dc.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = ? AND table_name = ?", currentDatabase, tableName).Scan(&count)
+	return count > 0
 }
 
-func (c commonDialect) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
+// HasColumn - check has column or not
+func (dc *DialectCommon) HasColumn(tableName string, columnName string) bool {
+	var count int
+	currentDatabase, tableName := dc.currentDatabaseAndTable(tableName)
+	dc.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = ? AND table_name = ? AND column_name = ?", currentDatabase, tableName, columnName).Scan(&count)
+	return count > 0
+}
+
+// ModifyColumn - modify column's type
+func (dc *DialectCommon) ModifyColumn(tableName string, columnName string, typ string) error {
+	_, err := dc.store.Exec(fmt.Sprintf("ALTER TABLE %v ALTER COLUMN %v TYPE %v", tableName, columnName, typ))
+	return err
+}
+
+// LimitAndOffsetSQL - returns generated SQL with Limit and Offset
+func (dc *DialectCommon) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
 	if limit != nil {
 		if parsedLimit, err := strconv.ParseInt(fmt.Sprint(limit), 0, 0); err == nil && parsedLimit >= 0 {
 			sql += fmt.Sprintf(" LIMIT %d", parsedLimit)
@@ -108,24 +105,33 @@ func (c commonDialect) LimitAndOffsetSQL(limit, offset interface{}) (sql string)
 	return
 }
 
-func (c commonDialect) LastInsertIDReturningSuffix(tableName string, columnName string) string {
+// LastInsertIDReturningSuffix - most dbs support LastInsertId, butp postgress needs to use 'RETURNING'
+func (dc *DialectCommon) LastInsertIDReturningSuffix(tableName string, columnName string) string {
 	return ""
 }
 
-func (c commonDialect) DefaultValueStr() string {
+// DefaultValueStr -
+func (dc *DialectCommon) DefaultValueStr() string {
 	return "DEFAULT VALUES"
 }
 
-func (c commonDialect) Lock(fn func() error) error {
+// CurrentDatabase - returns current database name
+func (dc *DialectCommon) CurrentDatabase() (name string) {
+	dc.store.QueryRow("SELECT DATABASE()").Scan(&name)
+	return
+}
+
+// Lock -
+func (dc *DialectCommon) Lock(fn func() error) error {
 	return fn()
 }
 
-func (c commonDialect) currentDatabaseAndTable(tableName string) (string, string) {
+func (dc *DialectCommon) currentDatabaseAndTable(tableName string) (string, string) {
 	if strings.Contains(tableName, ".") {
 		splitStrings := strings.SplitN(tableName, ".", 2)
 		return splitStrings[0], splitStrings[1]
 	}
-	return c.CurrentDatabase(), tableName
+	return dc.CurrentDatabase(), tableName
 }
 
 // BuildKeyName returns a valid key name (foreign key, index key) for the given table, field and reference

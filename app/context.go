@@ -1,19 +1,20 @@
 package app
 
 import (
-	"github.com/sedind/flow/app/dbe"
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"io"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/sedind/flow/app/dbe"
 )
 
 // Context -
 type Context struct {
 	Config
-	DBConnections map[string]*dbe.Connection{}
+	DBConnections map[string]*dbe.Connection
 }
 
 // AppSetting gets appSetting string for given key

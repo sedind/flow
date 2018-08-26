@@ -9,53 +9,45 @@ import (
 	"unicode/utf8"
 )
 
-type mysql struct {
-	commonDialect
+// DialectMySQL dialect implementation speciffic to mysql engine
+type DialectMySQL struct {
+	DialectCommon
 }
 
-func init() {
-	RegisterDialect("mysql", &mysql{})
-}
-
-func (mysql) Name() string {
+//Name - returns dialect name
+func (d *DialectMySQL) Name() string {
 	return "mysql"
 }
 
-func (s mysql) URL() string {
-	d := s.details
-	if d.URL != "" {
-		return strings.TrimPrefix(d.URL, "mysql://")
+//URL gets connection string url
+func (d *DialectMySQL) URL() string {
+	c := d.details
+	if c.URL != "" {
+		return strings.TrimPrefix(c.URL, "mysql://")
 	}
-	url := "%s:%s@(%s:%s)/%s?parseTime=true&multiStatements=true&readTimeout=1s"
-	return fmt.Sprintf(url, d.User, d.Password, d.Host, d.Port, d.Database)
+	s := "%s:%s@(%s:%s)/%s?parseTime=true&multiStatements=true&readTimeout=1s"
+	return fmt.Sprintf(s, c.User, c.Password, c.Host, c.Port, c.Database)
 }
 
-func (s mysql) urlWithoutDb() string {
-	d := s.details
-	if d.URL != "" {
-		// respect user's own URL definition (with options).
-		url := strings.TrimPrefix(d.URL, "mysql://")
-		return strings.Replace(url, "/"+d.Database+"?", "/?", 1)
-	}
-	url := "%s:%s@(%s:%s)/?parseTime=true&multiStatements=true&readTimeout=1s"
-	return fmt.Sprintf(url, d.User, d.Password, d.Host, d.Port)
-}
-
-func (mysql) Quote(key string) string {
+// Quote -
+func (d *DialectMySQL) Quote(key string) string {
 	return fmt.Sprintf("`%s`", key)
 }
 
-func (s mysql) RemoveIndex(tableName string, indexName string) error {
-	_, err := s.store.Exec(fmt.Sprintf("DROP INDEX %v ON %v", indexName, s.Quote(tableName)))
+// RemoveIndex -
+func (d *DialectMySQL) RemoveIndex(tableName string, indexName string) error {
+	_, err := d.store.Exec(fmt.Sprintf("DROP INDEX %v ON %v", indexName, d.Quote(tableName)))
 	return err
 }
 
-func (s mysql) ModifyColumn(tableName string, columnName string, typ string) error {
-	_, err := s.store.Exec(fmt.Sprintf("ALTER TABLE %v MODIFY COLUMN %v %v", tableName, columnName, typ))
+// ModifyColumn -
+func (d *DialectMySQL) ModifyColumn(tableName string, columnName string, typ string) error {
+	_, err := d.store.Exec(fmt.Sprintf("ALTER TABLE %v MODIFY COLUMN %v %v", tableName, columnName, typ))
 	return err
 }
 
-func (s mysql) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
+// LimitAndOffsetSQL -
+func (d *DialectMySQL) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
 	if limit != nil {
 		if parsedLimit, err := strconv.ParseInt(fmt.Sprint(limit), 0, 0); err == nil && parsedLimit >= 0 {
 			sql += fmt.Sprintf(" LIMIT %d", parsedLimit)
@@ -70,24 +62,28 @@ func (s mysql) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
 	return
 }
 
-func (s mysql) HasForeignKey(tableName string, foreignKeyName string) bool {
+// HasForeignKey -
+func (d *DialectMySQL) HasForeignKey(tableName string, foreignKeyName string) bool {
 	var count int
-	currentDatabase, tableName := s.currentDatabaseAndTable(tableName)
-	s.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=? AND TABLE_NAME=? AND CONSTRAINT_NAME=? AND CONSTRAINT_TYPE='FOREIGN KEY'", currentDatabase, tableName, foreignKeyName).Scan(&count)
+	currentDatabase, tableName := d.currentDatabaseAndTable(tableName)
+	d.store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=? AND TABLE_NAME=? AND CONSTRAINT_NAME=? AND CONSTRAINT_TYPE='FOREIGN KEY'", currentDatabase, tableName, foreignKeyName).Scan(&count)
 	return count > 0
 }
 
-func (s mysql) CurrentDatabase() (name string) {
-	s.store.QueryRow("SELECT DATABASE()").Scan(&name)
+// CurrentDatabase -
+func (d *DialectMySQL) CurrentDatabase() (name string) {
+	d.store.QueryRow("SELECT DATABASE()").Scan(&name)
 	return
 }
 
-func (mysql) SelectFromDummyTable() string {
+//SelectFromDummyTable -
+func (d *DialectMySQL) SelectFromDummyTable() string {
 	return "FROM DUAL"
 }
 
-func (s mysql) BuildKeyName(kind, tableName string, fields ...string) string {
-	keyName := s.commonDialect.BuildKeyName(kind, tableName, fields...)
+//BuildKeyName -
+func (d *DialectMySQL) BuildKeyName(kind, tableName string, fields ...string) string {
+	keyName := d.DialectCommon.BuildKeyName(kind, tableName, fields...)
 	if utf8.RuneCountInString(keyName) <= 64 {
 		return keyName
 	}
@@ -104,6 +100,7 @@ func (s mysql) BuildKeyName(kind, tableName string, fields ...string) string {
 	return fmt.Sprintf("%s%x", string(destRunes), bs)
 }
 
-func (mysql) DefaultValueStr() string {
+//DefaultValueStr -
+func (d *DialectMySQL) DefaultValueStr() string {
 	return "VALUES()"
 }
