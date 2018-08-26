@@ -7,5 +7,5 @@ type contextKey struct {
 }
 
 func (k *contextKey) String() string {
-	return "request/middleware context value " + k.name
+	return "middleware context value " + k.name
 }

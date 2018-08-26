@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/go-chi/chi"
+	"github.com/sedind/flow/app/router"
 )
 
 // StripSlashes is a middleware that will match request paths with a trailing
@@ -12,7 +12,7 @@ import (
 func StripSlashes(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var path string
-		rctx := chi.RouteContext(r.Context())
+		rctx := router.RouteContext(r.Context())
 		if rctx.RoutePath != "" {
 			path = rctx.RoutePath
 		} else {
@@ -31,7 +31,7 @@ func StripSlashes(next http.Handler) http.Handler {
 func RedirectSlashes(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var path string
-		rctx := chi.RouteContext(r.Context())
+		rctx := router.RouteContext(r.Context())
 		if rctx.RoutePath != "" {
 			path = rctx.RoutePath
 		} else {

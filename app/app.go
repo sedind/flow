@@ -22,7 +22,6 @@ func New(configFile string) *Context {
 			panic(err)
 		}
 		connections[k] = c
-
 	}
 
 	return &Context{

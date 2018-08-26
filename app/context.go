@@ -17,6 +17,14 @@ type Context struct {
 	DBConnections map[string]*dbe.Connection
 }
 
+// DefaultConnection gets default DB Connection
+func (c *Context) DefaultConnection() *dbe.Connection {
+	if c, ok := c.DBConnections[c.Config.DefaultConnection]; ok {
+		return c
+	}
+	return nil
+}
+
 // AppSetting gets appSetting string for given key
 func (c *Context) AppSetting(key string) string {
 	if val, ok := c.AppSettings[key]; ok {

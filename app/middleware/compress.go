@@ -208,5 +208,5 @@ func (w *maybeCompressResponseWriter) Close() error {
 	if c, ok := w.w.(io.WriteCloser); ok {
 		return c.Close()
 	}
-	return errors.New("chi/middleware: io.WriteCloser is unavailable on the writer")
+	return errors.New("middleware: io.WriteCloser is unavailable on the writer")
 }
