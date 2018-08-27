@@ -11,7 +11,10 @@ import (
 // Version is the current version of the flow binary
 const Version = "v0.0.1"
 
-var globalCommands = []string{"init", "version", "info", "help"}
+// ProjectFile is name of file which holds flow configuration
+const ProjectFile = "flow.yml"
+
+var globalCommands = []string{"init", "version", "help"}
 
 // RootCmd is the hook for all of the other commands in the flow binary
 var RootCmd = &cobra.Command{
@@ -47,7 +50,7 @@ func Execute() {
 }
 
 func isInsideProject() bool {
-	if _, err := os.Stat("flow.yml"); err != nil {
+	if _, err := os.Stat(ProjectFile); err != nil {
 		return false
 	}
 	return true
