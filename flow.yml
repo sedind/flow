@@ -10,6 +10,6 @@ watcher:
     extensions:
      - .go
     ignore:
-      - app
+      - app/flow
   
 

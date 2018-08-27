@@ -46,6 +46,10 @@ func (m *Manager) runAndListen(cmd *exec.Cmd) error {
 	m.Logger.Success("Running: %s (PID: %d)", strings.Join(cmd.Args, " "), cmd.Process.Pid)
 	err = cmd.Wait()
 	if err != nil {
+		if err.Error() == "signal: killed" {
+			m.Logger.Success(err)
+			return nil
+		}
 		m.Logger.Error(fmt.Errorf("%s\n%s", err, stderr.String()))
 		return err
 	}

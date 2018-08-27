@@ -50,6 +50,7 @@ func (m *Manager) Start() error {
 	m.Logger.Success(fmt.Sprintf("Start watcher %s", m.Name))
 	w := NewWatcher(m)
 	w.Start()
+	go m.build(fsnotify.Event{Name: ":start:"})
 	go func() {
 		for {
 			select {
@@ -59,8 +60,8 @@ func (m *Manager) Start() error {
 				}
 				w.Remove(event.Name)
 				w.Add(event.Name)
-			//case err := <-w.Errors:
-			//	m.Logger.Error(err)
+			case err := <-w.Errors:
+				m.Logger.Error(err)
 			case <-m.context.Done():
 				break
 			}
