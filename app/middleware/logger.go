@@ -95,10 +95,6 @@ func (l *DefaultLogFormatter) NewLogEntry(r *http.Request) LogEntry {
 		useColor:            useColor,
 	}
 
-	reqID := GetReqID(r.Context())
-	if reqID != "" {
-		cW(entry.buf, useColor, nYellow, "[%s] ", reqID)
-	}
 	cW(entry.buf, useColor, nCyan, "\"")
 	cW(entry.buf, useColor, bMagenta, "%s ", r.Method)
 
