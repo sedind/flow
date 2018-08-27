@@ -7,9 +7,5 @@ watcher:
     change_args: [build, -v, -i, -o, tmp/flow]
     post_change_command: "tmp/flow"
     post_change_args: []
-    extensions:
-     - .go
-    ignore:
-      - app/flow
-  
-
+    extensions: [.go, .yml]
+    ignore: [app/flow]

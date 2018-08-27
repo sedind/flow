@@ -3,7 +3,7 @@ vendor/
 **/*.sqlite
 .idea/
 bin/
-tmp/
+tmp
 node_modules/
 .sass-cache/
 .env
