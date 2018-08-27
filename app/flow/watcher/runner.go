@@ -17,10 +17,10 @@ func (m *Manager) runner() {
 			pid := cmd.Process.Pid
 			m.Logger.Success("Stopping: PID %d", pid)
 			cmd.Process.Kill()
-		} else {
-
-			cmd = exec.Command(m.PostChangeCommand)
 		}
+
+		cmd = exec.Command(m.PostChangeCommand, m.PostChangeArgs...)
+
 		go func() {
 			err := m.runAndListen(cmd)
 			if err != nil {

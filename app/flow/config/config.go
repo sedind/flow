@@ -17,7 +17,9 @@ type WatcherConfig struct {
 	Name              string   `yaml:"name"`
 	Watch             string   `yaml:"watch"`
 	ChangeCommand     string   `yaml:"change_command"`
+	ChangeArgs        []string `yaml:"change_args"`
 	PostChangeCommand string   `yaml:"post_change_command"`
+	PostChangeArgs    []string `yaml:"post_change_args"`
 	Extensions        []string `yaml:"extensions"`
 	Ignore            []string `yaml:"ignore"`
 }

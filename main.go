@@ -13,6 +13,7 @@ func main() {
 	a.RegisterRouter(func(ctx *app.Context) http.Handler {
 		return newAppRouter(ctx)
 	})
+
 	// serve the app
 	if err := a.Serve(); err != nil {
 		log.Fatal(err)

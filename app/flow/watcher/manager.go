@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"os/exec"
 	"sync"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 
@@ -57,8 +59,8 @@ func (m *Manager) Start() error {
 				}
 				w.Remove(event.Name)
 				w.Add(event.Name)
-			case err := <-w.Errors:
-				m.Logger.Error(err)
+			//case err := <-w.Errors:
+			//	m.Logger.Error(err)
 			case <-m.context.Done():
 				break
 			}
@@ -70,7 +72,35 @@ func (m *Manager) Start() error {
 }
 
 func (m *Manager) build(event fsnotify.Event) {
-	m.Logger.Success(event.Name)
+	m.once.Do(func() {
+		defer func() {
+			m.once = &sync.Once{}
+		}()
+
+		m.buildTransaction(func() error {
+			now := time.Now()
+			m.Logger.Print("Rebuild on : %s", event.Name)
+
+			cmd := exec.Command(m.ChangeCommand, m.ChangeArgs...)
+
+			err := m.runAndListen(cmd)
+			if err != nil {
+				return err
+			}
+			tt := time.Since(now)
+			m.Logger.Success("Change command Completed (PID: %d) (TIME: %s)", cmd.Process.Pid, tt)
+			m.Restart <- true
+			return nil
+		})
+	})
+}
+
+func (m *Manager) buildTransaction(fn func() error) {
+	err := fn()
+	if err != nil {
+		m.Logger.Error("Error!")
+		m.Logger.Error(err)
+	}
 }
 
 // ID generates md5 has of current working directory

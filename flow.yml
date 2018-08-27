@@ -1,19 +1,12 @@
 app_root: .
 watcher:
   app:
-    name: "App watcher"
-    watch: app
-    change_command: "go version"
-    post_change_command: "go run *.go"
-    extensions:
-     - .go
-    ignore:
-      - flow
-  default:
-    name: "Default watcher"
+    name: "Application watcher"
     watch: .
-    change_command: "go version"
-    post_change_command: "go run *.go"
+    change_command: "go"
+    change_args: [build, -v, -i, -o, tmp/flow]
+    post_change_command: "tmp/flow"
+    post_change_args: []
     extensions:
      - .go
     ignore:
