@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	a := app.New("config.yaml")
+	a := app.New("config.yml")
 
 	a.RegisterRouter(func(ctx *app.Context) http.Handler {
 		return newAppRouter(ctx)
