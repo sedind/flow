@@ -13,6 +13,10 @@ func (m *Manager) runner() {
 	var cmd *exec.Cmd
 	for {
 		<-m.Restart
+		if m.PostChangeCommand == "" {
+			m.Logger.Print("`post_change_command` not provided in flow.yml")
+			return
+		}
 		if cmd != nil {
 			pid := cmd.Process.Pid
 			m.Logger.Success("Stopping: PID %d", pid)

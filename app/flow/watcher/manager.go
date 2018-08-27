@@ -81,6 +81,10 @@ func (m *Manager) build(event fsnotify.Event) {
 		m.buildTransaction(func() error {
 			now := time.Now()
 			m.Logger.Print("Rebuild on : %s", event.Name)
+			if m.ChangeCommand == "" {
+				m.Logger.Print("`change_command` not provided in flow.yml")
+				return nil
+			}
 
 			cmd := exec.Command(m.ChangeCommand, m.ChangeArgs...)
 
