@@ -2,8 +2,7 @@ package dbe
 
 import (
 	"database/sql"
-
-	"github.com/sedind/flow/app/randx"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -24,7 +23,7 @@ func NewConnection(details *Details) (*Connection, error) {
 	}
 
 	c := &Connection{
-		ID: randx.String(32),
+		ID: string(time.Now().Unix()),
 	}
 
 	dialect, err := newDialect(details)
