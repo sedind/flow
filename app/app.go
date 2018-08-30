@@ -32,7 +32,7 @@ func New(configFile string) *App {
 
 	connections := map[string]*dbe.Connection{}
 	for k, d := range appConfig.ConnectionStrings {
-		c, err := dbe.NewConnection(d)
+		c, err := dbe.NewConnection(*d)
 		if err != nil {
 			panic(err)
 		}
