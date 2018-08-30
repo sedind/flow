@@ -15,6 +15,7 @@ type Config struct {
 	PanicRecover      bool                    `yaml:"panic_recover"`
 	NoCache           bool                    `yaml:"no_cache"`
 	CORS              CORSConfig              `yaml:"cors"`
+	MigrationsPath    string                  `yaml:"migrations_path"`
 	DefaultConnection string                  `yaml:"default_connection"`
 	ConnectionStrings map[string]*dbe.Details `yaml:"connection_strings"`
 	AppSettings       map[string]string       `yaml:"app_settings"`

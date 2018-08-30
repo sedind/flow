@@ -24,6 +24,7 @@ cors:
     - Link
   allow_credentials: true
   max_age: 300
+migrations_path: migrations
 default_connection: default
 connection_strings:
   default:
