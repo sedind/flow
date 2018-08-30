@@ -1,5 +1,6 @@
 name: Flow CMS - REST API
 addr: 0.0.0.0:3000
+log_level: debug
 request_logging: true
 compress_response: true
 redirect_slashes: true
@@ -25,9 +26,9 @@ cors:
   max_age: 300
 default_connection: default
 connection_strings:
-  #default:
-    #url: {{envOr "DB_URL" "mysql://root:root@(localhost:3306)/flow_dev?parseTime=true&multiStatements=true&readTimeout=1s"}}
-    #dialect: "mysql"
+  default:
+    url: {{envOr "DB_URL" "root:root@(localhost:3306)/flow_dev?parseTime=true&multiStatements=true&readTimeout=1s"}}
+    dialect: "mysql"
     #database: "flow_dev"
     #host: "localhost"
     #port: "3306"

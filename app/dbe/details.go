@@ -1,7 +1,6 @@
 package dbe
 
 import (
-	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -31,37 +30,11 @@ var dialectRegex = regexp.MustCompile(`\s+:\/\/`)
 
 // Finalize cleans up the connection details by normalizing names
 func (d *Details) Finalize() error {
-	// check if db connection is passed in form of URL and construct details from URL
-	if d.URL != "" {
-		ul := d.URL
-		if d.Dialect != "" {
-			if !dialectRegex.MatchString(ul) {
-				ul = d.Dialect + "://" + ul
-			}
-		}
-		d.Database = d.URL
-		u, err := url.Parse(ul)
-		if err != nil {
-			return errors.Wrapf(err, "could not parse %s", ul)
-		}
-		d.Dialect = u.Scheme
-		d.Database = u.Path
 
-		hp := strings.Split(u.Host, ":")
-		d.Host = hp[0]
-		if len(hp) > 1 {
-			d.Port = hp[1]
-		}
-
-		if u.User != nil {
-			d.User = u.User.Username()
-			d.Password, _ = u.User.Password()
-		}
-	}
 	switch strings.ToLower(d.Dialect) {
 	case "mysql":
 		if d.URL != "" {
-			cfg, err := _mysql.ParseDSN(strings.TrimPrefix(d.URL, "mysql://"))
+			cfg, err := _mysql.ParseDSN(d.URL)
 			if err != nil {
 				return errors.Wrap(err, "The URL is not supported by MySQL driver")
 			}

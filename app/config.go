@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Name              string                  `yaml:"name"`
 	Addr              string                  `yaml:"addr"`
+	LogLevel          string                  `yaml:"log_level"`
 	RequestLogging    bool                    `yaml:"request_logging"`
 	CompressResponse  bool                    `yaml:"compress_response"`
 	RedirectSlashes   bool                    `yaml:"redirect_slashes"`

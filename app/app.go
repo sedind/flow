@@ -10,9 +10,12 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/sedind/flow/app/dotenv"
+
 	"github.com/pkg/errors"
 	"github.com/sedind/flow/app/config"
 	"github.com/sedind/flow/app/dbe"
+	"github.com/sedind/flow/app/logger"
 )
 
 // App is where everything is connected
@@ -23,6 +26,10 @@ type App struct {
 
 // New creates instance of application Context
 func New(configFile string) *App {
+	//load .env file
+	dotenv.Load()
+
+	//load application config
 	appConfig := Config{}
 
 	err := config.LoadFromPath(configFile, &appConfig)
@@ -30,18 +37,28 @@ func New(configFile string) *App {
 		panic(err)
 	}
 
+	// initialize logger
+	appLogger := logger.New(appConfig.LogLevel)
+
+	//create application DB connections
 	connections := map[string]*dbe.Connection{}
 	for k, d := range appConfig.ConnectionStrings {
 		c, err := dbe.NewConnection(*d)
 		if err != nil {
-			panic(err)
+			appLogger.Panic(err)
+		}
+		err = c.Open()
+		if err != nil {
+			appLogger.Error(errors.Wrapf(err, "Unable to connect to %s connection", k))
 		}
 		connections[k] = c
 	}
 
+	// create application context object
 	ctx := Context{
 		appConfig,
 		connections,
+		appLogger,
 	}
 
 	return &App{

@@ -45,7 +45,8 @@ func (c *Connection) Open() error {
 	dbc.SetMaxIdleConns(c.Details.IdlePool)
 
 	c.DB = dbc
-	return nil
+
+	return dbc.Ping()
 
 }
 

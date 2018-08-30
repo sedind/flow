@@ -51,6 +51,15 @@ func (ctrl *Controller) Routes() *router.Mux {
 
 // HomeGetAction handles HTTP GET methos on / route
 func (ctrl *Controller) HomeGetAction(w http.ResponseWriter, r *http.Request) {
-	_, tokenString, _ := ctrl.tokenAuth.Encode(jwtauth.Claims{"user_id": 123})
-	ctrl.JSON(w, 200, ctrl.ResponseData(tokenString))
+	//_, tokenString, _ := ctrl.tokenAuth.Encode(jwtauth.Claims{"user_id": 123})
+
+	db := ctrl.DefaultConnection().DB
+
+	var currentDatabase string
+	var count int
+
+	db.QueryRow("SELECT DATABASE()").Scan(&currentDatabase)
+
+	db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = ? AND table_name = ?", currentDatabase, "test").Scan(&count)
+	ctrl.JSON(w, 200, ctrl.ResponseData(count))
 }

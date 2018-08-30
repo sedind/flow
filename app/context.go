@@ -9,12 +9,14 @@ import (
 	"net/http"
 
 	"github.com/sedind/flow/app/dbe"
+	"github.com/sedind/flow/app/logger"
 )
 
 // Context -
 type Context struct {
 	Config
 	DBConnections map[string]*dbe.Connection
+	Logger        logger.Logger
 }
 
 // DefaultConnection gets default DB Connection
