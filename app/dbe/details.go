@@ -40,31 +40,25 @@ func (d *Details) Finalize() error {
 			}
 		}
 		d.Database = d.URL
-		if !strings.HasPrefix(d.Dialect, "sqlite") {
-			u, err := url.Parse(ul)
-			if err != nil {
-				return errors.Wrapf(err, "could not parse %s", ul)
-			}
-			d.Dialect = u.Scheme
-			d.Database = u.Path
+		u, err := url.Parse(ul)
+		if err != nil {
+			return errors.Wrapf(err, "could not parse %s", ul)
+		}
+		d.Dialect = u.Scheme
+		d.Database = u.Path
 
-			hp := strings.Split(u.Host, ":")
-			d.Host = hp[0]
-			if len(hp) > 1 {
-				d.Port = hp[1]
-			}
+		hp := strings.Split(u.Host, ":")
+		d.Host = hp[0]
+		if len(hp) > 1 {
+			d.Port = hp[1]
+		}
 
-			if u.User != nil {
-				d.User = u.User.Username()
-				d.Password, _ = u.User.Password()
-			}
+		if u.User != nil {
+			d.User = u.User.Username()
+			d.Password, _ = u.User.Password()
 		}
 	}
 	switch strings.ToLower(d.Dialect) {
-	case "postgres", "postgresql", "pg":
-		d.Dialect = "postgres"
-		d.Port = defaults.String(d.Port, "5432")
-		d.Database = strings.TrimPrefix(d.Database, "/")
 	case "mysql":
 		if d.URL != "" {
 			cfg, err := _mysql.ParseDSN(strings.TrimPrefix(d.URL, "mysql://"))
@@ -93,8 +87,6 @@ func (d *Details) Finalize() error {
 			d.Port = defaults.String(d.Port, "3306")
 			d.Database = strings.TrimPrefix(d.Database, "/")
 		}
-	case "sqlite", "sqlite3":
-		d.Dialect = "sqlite3"
 	default:
 		return errors.Errorf("Unsupported dialect `%s`!", d.Dialect)
 	}
