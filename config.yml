@@ -1,6 +1,6 @@
 name: Flow CMS - REST API
 addr: 0.0.0.0:3000
-log_level: debug
+log_level: {{envOr "LOG_LEVEL" "debug"}}
 request_logging: true
 compress_response: true
 redirect_slashes: true
