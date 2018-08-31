@@ -13,6 +13,5 @@ var migrateCmd = &cobra.Command{
 
 func init() {
 	migrate.Bind(migrateCmd)
-
 	RootCmd.AddCommand(migrateCmd)
 }

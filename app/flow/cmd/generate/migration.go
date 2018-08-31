@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var configFile, migrationsPath string
-
 // migrationCmd generates sql migration files
 var migrationCmd = &cobra.Command{
 	Use:   "migration [name]",
@@ -43,10 +41,3 @@ var migrationCmd = &cobra.Command{
 		return migration.Generate(path.Path, args[0], "sql", nil, nil)
 	},
 }
-
-func init() {
-	migrationCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "Configuration file path")
-	migrationCmd.PersistentFlags().StringVarP(&migrationsPath, "target", "t", "", "Target path where migration will be generated")
-}
-
-//assignee = currentUser()
