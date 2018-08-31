@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -75,6 +74,7 @@ func (a *App) RegisterRouter(fn func(ctx *Context) http.Handler) {
 // interrupt and kill signals and will attempt to stop the application
 // gracefully.
 func (a *App) Serve() error {
+	a.Context.Logger.Infof("Starting Application at %s", a.Context.Addr)
 	if a.Router == nil {
 		return errors.New("Application Router not initialized")
 	}
@@ -115,7 +115,7 @@ func (a *App) Serve() error {
 
 // Stop the application
 func (a *App) Stop(err error) error {
-	fmt.Println("Stopping application...")
+	a.Context.Logger.Info("Stopping application...")
 	if err != nil && errors.Cause(err) != context.Canceled {
 		return err
 	}
