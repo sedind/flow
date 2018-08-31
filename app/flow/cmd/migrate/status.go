@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// StatusCmd generates sql migration files
-var StatusCmd = &cobra.Command{
+// statusCmd generates sql migration files
+var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Displays the status of all migrations.",
 	RunE: func(cmd *cobra.Command, args []string) error {

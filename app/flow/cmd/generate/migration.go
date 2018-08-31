@@ -10,8 +10,8 @@ import (
 
 var configFile, migrationsPath string
 
-// MigrationCmd generates sql migration files
-var MigrationCmd = &cobra.Command{
+// migrationCmd generates sql migration files
+var migrationCmd = &cobra.Command{
 	Use:   "migration [name]",
 	Short: "Generates Up/Down migration files for your SQL database.",
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -45,8 +45,8 @@ var MigrationCmd = &cobra.Command{
 }
 
 func init() {
-	MigrationCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "Configuration file path")
-	MigrationCmd.PersistentFlags().StringVarP(&migrationsPath, "target", "t", "", "Target path where migration will be generated")
+	migrationCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "Configuration file path")
+	migrationCmd.PersistentFlags().StringVarP(&migrationsPath, "target", "t", "", "Target path where migration will be generated")
 }
 
 //assignee = currentUser()

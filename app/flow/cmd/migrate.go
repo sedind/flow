@@ -12,10 +12,7 @@ var migrateCmd = &cobra.Command{
 }
 
 func init() {
-	migrateCmd.AddCommand(migrate.UpCmd)
-	migrateCmd.AddCommand(migrate.DownCmd)
-	migrateCmd.AddCommand(migrate.ResetCmd)
-	migrateCmd.AddCommand(migrate.StatusCmd)
+	migrate.Bind(migrateCmd)
 
 	RootCmd.AddCommand(migrateCmd)
 }

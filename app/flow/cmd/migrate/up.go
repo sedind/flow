@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// UpCmd generates sql migration files
-var UpCmd = &cobra.Command{
+// upCmd generates sql migration files
+var upCmd = &cobra.Command{
 	Use:   "up",
 	Short: "Apply all of the 'up' migrations.",
 	RunE: func(cmd *cobra.Command, args []string) error {
