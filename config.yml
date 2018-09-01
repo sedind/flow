@@ -29,7 +29,7 @@ default_connection: default
 connection_strings:
   default:
     url: {{env "DB_URL"}}
-    dialect: "mysql"
+    dialect: {{envOr "DB_DIALECT" "mysql"}}
     #database: "flow_dev"
     #host: "localhost"
     #port: "3306"
@@ -43,3 +43,5 @@ connection_strings:
   
 app_settings:
   jwt_secret: {{env "JWT_SECRET"}}
+  google_auth_id: {{env "GOOGLE_AUTH_ID"}}
+  google_auth_secret: {{env "GOOGLE_AUTH_SECRET"}}
