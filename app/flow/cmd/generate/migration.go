@@ -1,10 +1,15 @@
 package generate
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/sedind/flow/app/config"
 
-	"github.com/sedind/flow/app/dbe/migration"
 	"github.com/spf13/cobra"
 )
 
@@ -18,11 +23,11 @@ var migrationCmd = &cobra.Command{
 		}
 		if migrationsPath != "" {
 			// we will ignore project configuration and use migrations path to generate migration
-			return migration.Generate(migrationsPath, args[0], "sql", nil, nil)
+			return generateMigrationFile(migrationsPath, args[0], "sql", nil, nil)
 		}
 
 		if configFile == "" {
-			return errors.New("target not provided")
+			return errors.New("config file not provided")
 		}
 
 		var path struct {
@@ -38,6 +43,33 @@ var migrationCmd = &cobra.Command{
 			return errors.New("migrations_path can not be empty in configuration file")
 		}
 
-		return migration.Generate(path.Path, args[0], "sql", nil, nil)
+		return generateMigrationFile(path.Path, args[0], "sql", nil, nil)
 	},
+}
+
+// generateMigrationFile writes contents for a given migration in normalized files
+func generateMigrationFile(path, name, ext string, up, down []byte) error {
+	n := time.Now().UTC()
+	s := n.Format("20060102150405")
+
+	err := os.MkdirAll(path, 0766)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't create migrations path %s", path)
+	}
+
+	upf := filepath.Join(path, (fmt.Sprintf("%s_%s.up.%s", s, name, ext)))
+	err = ioutil.WriteFile(upf, up, 0666)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't write up migration %s", upf)
+	}
+	fmt.Printf("> %s\n", upf)
+
+	downf := filepath.Join(path, (fmt.Sprintf("%s_%s.down.%s", s, name, ext)))
+	err = ioutil.WriteFile(downf, down, 0666)
+	if err != nil {
+		return errors.Wrapf(err, "couldn't write up migration %s", downf)
+	}
+
+	fmt.Printf("> %s\n", downf)
+	return nil
 }

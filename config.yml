@@ -39,6 +39,7 @@ connection_strings:
     #idle_pool: 0
     #options: 
     #  key: value
+    #  migration_schema: schema_migration
   
 app_settings:
   jwt_secret: {{env "JWT_SECRET"}}
