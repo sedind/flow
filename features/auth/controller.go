@@ -26,6 +26,7 @@ func New(ctx *app.Context) *Controller {
 
 	gAuthID := ctx.AppSetting("google_auth_id")
 	gAuthSecret := ctx.AppSetting("google_auth_secret")
+	gAuthRedirectURL := ctx.AppSetting("google_auth_redirect_url")
 	if gAuthID == "" {
 		ctx.Logger.Warn("google_auth_id key not provided in app_settings")
 	}
@@ -33,11 +34,14 @@ func New(ctx *app.Context) *Controller {
 	if gAuthSecret == "" {
 		ctx.Logger.Warn("google_auth_secret key not provided in app_settings")
 	}
+	if gAuthRedirectURL == "" {
+		ctx.Logger.Warn("google_auth_redirect_url key not provided in app_settings")
+	}
 
 	return &Controller{
 		Context:   ctx,
 		tokenAuth: jwtauth.New("HS256", []byte(secret), nil),
-		gAuth:     googleauth.New(gAuthID, gAuthSecret),
+		gAuth:     googleauth.New(gAuthID, gAuthSecret, gAuthRedirectURL),
 	}
 }
 

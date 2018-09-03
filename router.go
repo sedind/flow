@@ -67,7 +67,6 @@ func newAppRouter(ctx *app.Context) http.Handler {
 		// own very easily, look at the Authenticator method in jwtauth.go
 		// and tweak it, its not scary.
 		r.Use(auth.JWTAuthenticatorMiddleware)
-		r.Mount("/test", auth.Routes())
 
 	})
 

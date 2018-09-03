@@ -45,3 +45,4 @@ app_settings:
   jwt_secret: {{env "JWT_SECRET"}}
   google_auth_id: {{env "GOOGLE_AUTH_ID"}}
   google_auth_secret: {{env "GOOGLE_AUTH_SECRET"}}
+  google_auth_redirect_url: {{envOr "GOOGLE_AUTH_REDIRECT_URL" "http://localhost:3000/auth"}}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/sedind/flow/app"
@@ -16,7 +15,7 @@ func main() {
 
 	// serve the app
 	if err := a.Serve(); err != nil {
-		log.Fatal(err)
+		a.Context.Logger.Fatal(err)
 	}
 
 }

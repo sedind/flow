@@ -2,7 +2,6 @@ package googleauth
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"golang.org/x/oauth2"
@@ -21,7 +20,7 @@ type User struct {
 	EmailVerified bool   `json:"email_verified"`
 	Gender        string `json:"gender"`
 	Locale        string `json:"locale"`
-	Organization  string `json:"hd"`
+	HostedDomain  string `json:"hd"`
 }
 
 // GoogleAuth provides operations needed for google authentication
@@ -32,14 +31,14 @@ type GoogleAuth struct {
 }
 
 // New creates instance of google auth for provided cid and secret
-func New(clientID string, clientSecret string) *GoogleAuth {
+func New(clientID string, clientSecret string, redirectURL string) *GoogleAuth {
 	return &GoogleAuth{
 		id:     clientID,
 		secret: clientSecret,
 		cfg: &oauth2.Config{
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
-			RedirectURL:  "http://localhost:3000/auth",
+			RedirectURL:  redirectURL,
 			Scopes: []string{
 				"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 				"https://www.googleapis.com/auth/userinfo.profile",
@@ -73,8 +72,6 @@ func (g *GoogleAuth) Authenticate(code string) (User, error) {
 	if err != nil {
 		return user, err
 	}
-
-	fmt.Println("REsponse:", string(data))
 
 	err = json.Unmarshal(data, &user)
 	return user, err
