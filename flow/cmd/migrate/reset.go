@@ -2,11 +2,11 @@ package migrate
 
 import (
 	"github.com/pkg/errors"
+	"github.com/sedind/flow"
 	"github.com/sedind/flow/config"
 	"github.com/sedind/flow/dbe"
 	"github.com/sedind/flow/dotenv"
 	"github.com/spf13/cobra"
-	"github.com/swipestoxgmbh/flow"
 )
 
 // resetCmd generates sql migration files
