@@ -1,4 +1,4 @@
-package app
+package flow
 
 // Response represents response object for API
 type Response struct {

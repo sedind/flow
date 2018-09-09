@@ -1,4 +1,4 @@
-package app
+package flow
 
 import (
 	"bytes"

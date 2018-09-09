@@ -22,7 +22,7 @@ var downCmd = &cobra.Command{
 			return errors.New("config file not provided")
 		}
 		// get app config
-		appConfig := app.Config{}
+		appConfig := flow.Config{}
 		err := config.LoadFromPath(configFile, &appConfig)
 		if err != nil {
 			return errors.Wrapf(err, "Unable to load configuration %s", configFile)

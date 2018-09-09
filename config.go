@@ -1,4 +1,4 @@
-package app
+package flow
 
 import (
 	"github.com/sedind/flow/dbe"
