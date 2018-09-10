@@ -21,11 +21,6 @@ type Context struct {
 	Logger        logger.Logger
 }
 
-// Binder interface for managing request payloads.
-type Binder interface {
-	Bind(r *http.Request) error
-}
-
 // DefaultConnection gets default DB Connection
 func (c *Context) DefaultConnection() *dbe.Connection {
 	if c, ok := c.DBConnections[c.Config.DefaultConnection]; ok {
