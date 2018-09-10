@@ -7,7 +7,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sedind/flow/dbe"
 	"github.com/sedind/flow/logger"
 )
@@ -17,6 +19,11 @@ type Context struct {
 	Config
 	DBConnections map[string]*dbe.Connection
 	Logger        logger.Logger
+}
+
+// Binder interface for managing request payloads.
+type Binder interface {
+	Bind(r *http.Request) error
 }
 
 // DefaultConnection gets default DB Connection
@@ -126,4 +133,18 @@ func (c *Context) DecodeJSON(r io.Reader, v interface{}) error {
 func (c *Context) DecodeXML(r io.Reader, v interface{}) error {
 	defer io.Copy(ioutil.Discard, r)
 	return xml.NewDecoder(r).Decode(v)
+}
+
+// Bind decodes a request body and binds it with v Object
+func (c *Context) Bind(r *http.Request, v interface{}) error {
+	ct := r.Header.Get("Content-Type")
+	s := strings.TrimSpace(strings.Split(ct, ";")[0])
+	switch s {
+	case "application/json", "text/javascript":
+		return c.DecodeJSON(r.Body, v)
+	case "text/xml", "application/xml":
+		return c.DecodeXML(r.Body, v)
+	default:
+		return errors.Errorf("Unsupported Content-Type: %s", s)
+	}
 }
