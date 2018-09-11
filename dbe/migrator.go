@@ -61,7 +61,7 @@ func (m Migrator) Up() error {
 				return errors.WithStack(err)
 			}
 
-			_, err = m.Conn.DB.Exec(fmt.Sprintf("insert into %s (version,name) values (?,?)", m.migrationSchema()), migration.Version, migration.Name)
+			_, err = m.Conn.Store.Exec(fmt.Sprintf("insert into %s (version,name) values (?,?)", m.migrationSchema()), migration.Version, migration.Name)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -105,7 +105,7 @@ func (m Migrator) Down(step int) error {
 				return errors.WithStack(err)
 			}
 
-			_, err = m.Conn.DB.Exec(fmt.Sprintf("delete from %s where version = ? ", m.migrationSchema()), migration.Version)
+			_, err = m.Conn.Store.Exec(fmt.Sprintf("delete from %s where version = ? ", m.migrationSchema()), migration.Version)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -158,7 +158,7 @@ func (m Migrator) CreateSchemaMigrations() error {
 		return errors.Errorf("Version Schema missing for dialect %s", dialect)
 	}
 
-	_, err := m.Conn.DB.Exec(sql)
+	_, err := m.Conn.Store.Exec(sql)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -183,9 +183,9 @@ func (m Migrator) hasMigrationsSchema() bool {
 	var currentDatabase string
 	var count int
 
-	m.Conn.DB.QueryRow("SELECT DATABASE()").Scan(&currentDatabase)
+	m.Conn.Store.QueryRow("SELECT DATABASE()").Scan(&currentDatabase)
 
-	m.Conn.DB.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = ? AND table_name = ?", currentDatabase, m.migrationSchema()).Scan(&count)
+	m.Conn.Store.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = ? AND table_name = ?", currentDatabase, m.migrationSchema()).Scan(&count)
 	return count > 0
 }
 
@@ -199,7 +199,7 @@ func (m Migrator) getMigrationsSchema(dialect string) string {
 
 func (m Migrator) getExecutedMigrationsCount() (int, error) {
 	var count int
-	err := m.Conn.DB.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s", m.migrationSchema())).Scan(&count)
+	err := m.Conn.Store.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s", m.migrationSchema())).Scan(&count)
 
 	return count, err
 }
