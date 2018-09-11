@@ -72,7 +72,7 @@ func (fm *FileMigrator) loadMigrations() error {
 						return nil
 					}
 
-					tx, err := conn.DB.Begin()
+					tx, err := conn.Store.Begin()
 					if err != nil {
 						return err
 					}

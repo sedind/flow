@@ -33,7 +33,7 @@ func (m Migration) Run(conn *Connection) error {
 // Exists checks if migration exists in DB
 func (m Migration) Exists(conn *Connection, migrationTable string) (bool, error) {
 	var count int
-	err := conn.DB.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE version = ?", migrationTable), m.Version).Scan(&count)
+	err := conn.Store.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE version = ?", migrationTable), m.Version).Scan(&count)
 
 	if err != nil {
 		return false, errors.WithStack(err)
