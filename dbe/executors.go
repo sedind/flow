@@ -18,7 +18,7 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 	}
 
 	Log(stmt)
-	fmt.Printf("%#v\n", m.Value)
+
 	res, err := c.Store.NamedExec(stmt, m.Value)
 	if err != nil {
 		fmt.Println(err)
