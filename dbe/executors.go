@@ -12,8 +12,6 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 	m := &Model{Value: model}
 	cols := m.Columns()
 
-	fmt.Printf("#%v\n", cols)
-
 	stmt, err := c.Dialect.CreateStmt(m.TableName(), cols)
 	if err != nil {
 		return err
