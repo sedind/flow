@@ -1,4 +1,4 @@
-package model
+package dbe
 
 import (
 	"fmt"
@@ -33,13 +33,6 @@ type Model struct {
 	Value
 	tableName string
 	As        string
-}
-
-// New Creates new DBE Model for given model object
-func New(model interface{}) *Model {
-	return &Model{
-		Value: model,
-	}
 }
 
 // ID returns Unique Identifier of the Model
