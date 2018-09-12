@@ -1,4 +1,4 @@
-package dbe
+package model
 
 import (
 	"fmt"
@@ -13,6 +13,8 @@ import (
 
 var tableMap = map[string]string{}
 var tableMapMutex = sync.RWMutex{}
+
+const modelTag = "db"
 
 // Value holds content of a Model object
 type Value interface{}
@@ -31,6 +33,13 @@ type Model struct {
 	Value
 	tableName string
 	As        string
+}
+
+// New Creates new DBE Model for given model object
+func New(model interface{}) *Model {
+	return &Model{
+		Value: model,
+	}
 }
 
 // ID returns Unique Identifier of the Model
@@ -87,6 +96,26 @@ func (m *Model) TouchUpdatedAt() {
 	if err == nil {
 		fbn.Set(reflect.ValueOf(time.Now()))
 	}
+}
+
+// Columns gets model database Columns using struct db tag
+func (m *Model) Columns() []string {
+	alias := m.As
+	if alias == "" {
+		alias = m.TableName()
+	}
+	cols := []string{}
+	t := reflect.TypeOf(m.Value)
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		tag := field.Tag.Get(modelTag)
+		if tag != "" && tag != "-" {
+			col := fmt.Sprintf("%s.%s", alias, tag)
+			cols = append(cols, col)
+		}
+	}
+
+	return cols
 }
 
 // WhereID constructs string for WHERE clause in query

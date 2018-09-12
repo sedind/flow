@@ -39,6 +39,11 @@ func New(configFile string) *App {
 	// initialize logger
 	appLogger := logger.New(appConfig.LogLevel)
 
+	// sed DBE logging
+	if appConfig.LogLevel == "debug" {
+		dbe.Debug = true
+	}
+
 	//create application DB connections
 	connections := map[string]*dbe.Connection{}
 	for k, d := range appConfig.ConnectionStrings {
