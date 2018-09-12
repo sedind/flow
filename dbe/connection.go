@@ -1,6 +1,7 @@
 package dbe
 
 import (
+	"fmt"
 	"sync/atomic"
 	"time"
 
@@ -29,6 +30,8 @@ func NewConnection(details Details) (*Connection, error) {
 	}
 
 	dialect, err := dialect.New(details.Dialect)
+	//fmt.Printf("#%v\n", dialect)
+	fmt.Println(dialect.CreateStmt("test", []string{"kokos"}))
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -76,6 +79,7 @@ func (c *Connection) NewTransaction() (*Connection, error) {
 		cn := &Connection{
 			ID:      string(time.Now().Unix()),
 			Details: c.Details,
+			Dialect: c.Dialect,
 			Store:   c.Store,
 			TX:      tx,
 		}
@@ -88,6 +92,7 @@ func (c *Connection) copy() *Connection {
 	return &Connection{
 		ID:      string(time.Now().Unix()),
 		Details: c.Details,
+		Dialect: c.Dialect,
 		Store:   c.Store,
 		TX:      c.TX,
 	}

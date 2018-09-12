@@ -98,8 +98,15 @@ func (m *Model) Columns() []string {
 		alias = m.TableName()
 	}
 	cols := []string{}
+
 	t := reflect.TypeOf(m.Value)
-	fmt.Printf("#%v\n", t)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+	}
+
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		tag := field.Tag.Get(modelTag)

@@ -11,6 +11,11 @@ var _ Dialect = Common{}
 type Common struct {
 }
 
+// Name for current dialect
+func (c Common) Name() string {
+	return "common"
+}
+
 // CreateStmt createse SQL INSER statement
 func (c Common) CreateStmt(tableName string, columns []string) (string, error) {
 	var colNames []string

@@ -8,3 +8,8 @@ func init() {
 type MySQL struct {
 	Common
 }
+
+// Name for current dialect
+func (m MySQL) Name() string {
+	return "mysql"
+}
