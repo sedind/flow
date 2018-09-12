@@ -12,6 +12,10 @@ import (
 func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 	m := &Model{Value: model}
 
+	if err := m.beforeCreate(c); err != nil {
+		return err
+	}
+
 	stmt, err := c.Dialect.CreateStmt(m.TableName(), m.Columns(), m.ColumnNames())
 	if err != nil {
 		return errors.WithStack(err)
@@ -26,13 +30,13 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 	}
 
 	id, err := res.LastInsertId()
-	if err == nil {
-		m.setID(id)
-	}
+
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return nil
+	m.setID(id)
+
+	return m.afterCreate(c)
 }
 
 // Delete given model from database
