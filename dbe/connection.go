@@ -6,6 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"github.com/sedind/flow/dbe/dialect"
 )
 
 // Connection represents all of the necessary details for
@@ -13,6 +14,7 @@ import (
 type Connection struct {
 	ID      string
 	Details Details
+	Dialect dialect.Dialect
 	Store   *sqlx.DB
 	TX      *sqlx.Tx
 	Elapsed int64
@@ -26,9 +28,15 @@ func NewConnection(details Details) (*Connection, error) {
 		return nil, errors.WithStack(err)
 	}
 
+	dialect, err := dialect.New(details.Dialect)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	c := &Connection{
 		ID:      string(time.Now().Unix()),
 		Details: details,
+		Dialect: dialect,
 	}
 
 	return c, nil

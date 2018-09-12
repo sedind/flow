@@ -1,10 +1,24 @@
 package dbe
 
-import "github.com/sedind/flow/validate"
+import (
+	"fmt"
+
+	"github.com/sedind/flow/validate"
+)
 
 // Create add a new given entry to the database, excluding the given columns.
 // It updates `created_at` and `updated_at` columns automatically.
 func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
+	m := &Model{Value: model}
+	cols := m.Columns()
+
+	stmt, err := c.Dialect.CreateStmt(m.TableName(), cols)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(stmt)
+
 	return nil
 }
 
