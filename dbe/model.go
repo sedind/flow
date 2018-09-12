@@ -98,7 +98,7 @@ func (m *Model) Columns() []string {
 		alias = m.TableName()
 	}
 	cols := []string{}
-	t := reflect.TypeOf(m.Value)
+	t := reflect.TypeOf(m.Value).Elem()
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		tag := field.Tag.Get(modelTag)
@@ -155,6 +155,7 @@ func (m *Model) typeName(t reflect.Type) string {
 
 func (m *Model) fieldByName(s string) (reflect.Value, error) {
 	el := reflect.ValueOf(m.Value).Elem()
+
 	fVal := el.FieldByName(s)
 	if !fVal.IsValid() {
 		return fVal, errors.Errorf("Model does not have a field %s", s)
