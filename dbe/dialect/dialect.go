@@ -8,7 +8,7 @@ import (
 // Dialect defines set of operations that are speccific to different SQL dialects
 type Dialect interface {
 	Name() string
-	CreateStmt(string, []string) (string, error)
+	CreateStmt(string, []string, []string) (string, error)
 }
 
 // list of registered dialects

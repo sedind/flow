@@ -44,6 +44,19 @@ func (m *Model) ID() interface{} {
 	return fVal.Interface()
 }
 
+func (m *Model) setID(i interface{}) {
+	fbn, err := m.fieldByName("ID")
+	if err == nil {
+		v := reflect.ValueOf(i)
+		switch fbn.Kind() {
+		case reflect.Int, reflect.Int64:
+			fbn.SetInt(v.Int())
+		default:
+			fbn.Set(reflect.ValueOf(i))
+		}
+	}
+}
+
 // TableName returns the corresponding name of the underlying database table
 // for a given `Model`. See also `TableNamer` to change the default name of the table.
 func (m *Model) TableName() string {
@@ -113,6 +126,33 @@ func (m *Model) Columns() []string {
 		if tag != "" && tag != "-" {
 			col := fmt.Sprintf("%s.%s", alias, tag)
 			cols = append(cols, col)
+		}
+	}
+
+	return cols
+}
+
+// ColumnNames gets model database Column Names
+func (m *Model) ColumnNames() []string {
+	alias := m.As
+	if alias == "" {
+		alias = m.TableName()
+	}
+	cols := []string{}
+
+	t := reflect.TypeOf(m.Value)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+	}
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		tag := field.Tag.Get(modelTag)
+		if tag != "" && tag != "-" {
+			cols = append(cols, ":"+tag)
 		}
 	}
 

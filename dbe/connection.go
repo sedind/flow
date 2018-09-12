@@ -1,7 +1,6 @@
 package dbe
 
 import (
-	"fmt"
 	"sync/atomic"
 	"time"
 
@@ -30,8 +29,7 @@ func NewConnection(details Details) (*Connection, error) {
 	}
 
 	dialect, err := dialect.New(details.Dialect)
-	//fmt.Printf("#%v\n", dialect)
-	fmt.Println(dialect.CreateStmt("test", []string{"kokos"}))
+
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

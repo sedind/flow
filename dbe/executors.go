@@ -3,6 +3,7 @@ package dbe
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/sedind/flow/validate"
 )
 
@@ -10,15 +11,27 @@ import (
 // It updates `created_at` and `updated_at` columns automatically.
 func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 	m := &Model{Value: model}
-	cols := m.Columns()
 
-	stmt, err := c.Dialect.CreateStmt(m.TableName(), cols)
+	stmt, err := c.Dialect.CreateStmt(m.TableName(), m.Columns(), m.ColumnNames())
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
-	fmt.Println(stmt)
+	Log(stmt)
+	fmt.Printf("%#v\n", m.Value)
+	res, err := c.Store.NamedExec(stmt, m.Value)
+	if err != nil {
+		fmt.Println(err)
+		return errors.WithStack(err)
+	}
 
+	id, err := res.LastInsertId()
+	if err == nil {
+		m.setID(id)
+	}
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	return nil
 }
 

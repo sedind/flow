@@ -17,16 +17,11 @@ func (c Common) Name() string {
 }
 
 // CreateStmt createse SQL INSER statement
-func (c Common) CreateStmt(tableName string, columns []string) (string, error) {
-	var colNames []string
-
-	for _, col := range columns {
-		colNames = append(colNames, ":"+col)
-	}
+func (c Common) CreateStmt(tableName string, columns []string, columnNames []string) (string, error) {
 
 	cols := strings.Join(columns, ",")
-	names := strings.Join(colNames, ",")
+	names := strings.Join(columnNames, ",")
 
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES %s", tableName, cols, names)
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, cols, names)
 	return query, nil
 }
