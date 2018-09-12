@@ -1,8 +1,6 @@
 package dbe
 
 import (
-	"fmt"
-
 	"github.com/sedind/flow/validate"
 )
 
@@ -11,13 +9,6 @@ import (
 func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 	m := &Model{Value: model}
 	cols := m.Columns()
-
-	stmt, err := c.Dialect.CreateStmt(m.TableName(), cols)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(stmt)
 
 	return nil
 }
