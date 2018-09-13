@@ -1,8 +1,6 @@
 package dbe
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 	"github.com/sedind/flow/validate"
 )
@@ -10,6 +8,7 @@ import (
 // Create add a new given entry to the database, excluding the given columns.
 // It updates `created_at` and `updated_at` columns automatically.
 func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
+
 	m := &Model{Value: model}
 
 	if err := m.beforeCreate(c); err != nil {
@@ -25,7 +24,6 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 
 	res, err := c.Store.NamedExec(stmt, m.Value)
 	if err != nil {
-		fmt.Println(err)
 		return errors.WithStack(err)
 	}
 

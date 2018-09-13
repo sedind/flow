@@ -1,7 +1,6 @@
 package dbe
 
 import (
-	"sync/atomic"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -15,9 +14,8 @@ type Connection struct {
 	ID      string
 	Details Details
 	Dialect dialect.Dialect
-	Store   *sqlx.DB
-	TX      *sqlx.Tx
-	Elapsed int64
+	Store   Store
+	Tx      *Tx
 }
 
 // NewConnection creates a new connection, and sets it's `Dialect`
@@ -56,7 +54,7 @@ func (c *Connection) Open() error {
 	dbc.SetMaxOpenConns(c.Details.Pool)
 	dbc.SetMaxIdleConns(c.Details.IdlePool)
 
-	c.Store = dbc
+	c.Store = &db{dbc}
 
 	return dbc.Ping()
 
@@ -67,19 +65,19 @@ func (c *Connection) Close() error {
 	return errors.Wrap(c.Store.Close(), "could not close connection")
 }
 
-// NewTransaction starts a new transaction on the connection
-func (c *Connection) NewTransaction() (*Connection, error) {
-	if c.TX == nil {
-		tx, err := c.Store.Beginx()
+// NewTx starts a new transaction on the connection
+func (c *Connection) NewTx() (*Connection, error) {
+	if c.Tx == nil {
+		tx, err := c.Store.Transaction()
 		if err != nil {
-			return nil, errors.Wrap(err, "could not start new transaction")
+			return c, errors.Wrap(err, "could not start new transaction")
 		}
 		cn := &Connection{
 			ID:      string(time.Now().Unix()),
 			Details: c.Details,
 			Dialect: c.Dialect,
-			Store:   c.Store,
-			TX:      tx,
+			Store:   tx,
+			Tx:      tx,
 		}
 		return cn, nil
 	}
@@ -92,16 +90,6 @@ func (c *Connection) copy() *Connection {
 		Details: c.Details,
 		Dialect: c.Dialect,
 		Store:   c.Store,
-		TX:      c.TX,
+		Tx:      c.Tx,
 	}
-}
-
-func (c *Connection) timeFunc(name string, fn func() error) error {
-	now := time.Now()
-	err := fn()
-	atomic.AddInt64(&c.Elapsed, int64(time.Now().Sub(now)))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
 }

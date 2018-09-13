@@ -72,21 +72,21 @@ func (fm *FileMigrator) loadMigrations() error {
 						return nil
 					}
 
-					tx, err := conn.Store.Begin()
+					c, err := conn.NewTx()
 					if err != nil {
 						return err
 					}
 
 					defer func() {
 						if err != nil {
-							tx.Rollback()
+							c.Tx.Rollback()
 							fmt.Printf("Migration %s Failed. Rolling back...", migration.Name)
 							return
 						}
-						tx.Commit()
+						c.Tx.Commit()
 					}()
 
-					_, err = tx.Exec(content)
+					_, err = c.Store.Exec(content)
 					if err != nil {
 						return errors.Wrapf(err, "error executing %s, sql: %s", migration.Path, content)
 					}
