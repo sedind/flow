@@ -105,12 +105,9 @@ func (m *Model) TouchUpdatedAt() {
 }
 
 // Columns gets model database Columns using struct db tag
-func (m *Model) Columns() []string {
-	alias := m.As
-	if alias == "" {
-		alias = m.TableName()
-	}
-	cols := []string{}
+func (m *Model) Columns() Columns {
+
+	names := []string{}
 
 	t := reflect.TypeOf(m.Value)
 	if t.Kind() == reflect.Ptr {
@@ -124,37 +121,12 @@ func (m *Model) Columns() []string {
 		field := t.Field(i)
 		tag := field.Tag.Get(modelTag)
 		if tag != "" && tag != "-" {
-			col := fmt.Sprintf("%s.%s", alias, tag)
-			cols = append(cols, col)
+			names = append(names, tag)
 		}
 	}
 
-	return cols
-}
-
-// ColumnNames gets model database Column Names
-func (m *Model) ColumnNames() []string {
-	alias := m.As
-	if alias == "" {
-		alias = m.TableName()
-	}
-	cols := []string{}
-
-	t := reflect.TypeOf(m.Value)
-	if t.Kind() == reflect.Ptr {
-		t = t.Elem()
-		if t.Kind() == reflect.Ptr {
-			t = t.Elem()
-		}
-	}
-
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get(modelTag)
-		if tag != "" && tag != "-" {
-			cols = append(cols, ":"+tag)
-		}
-	}
+	cols := NewColumnsWithAlias(m.TableName(), m.As)
+	cols.Add(names...)
 
 	return cols
 }

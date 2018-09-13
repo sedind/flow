@@ -2,7 +2,6 @@ package dialect
 
 import (
 	"fmt"
-	"strings"
 )
 
 var _ Dialect = Common{}
@@ -17,11 +16,8 @@ func (c Common) Name() string {
 }
 
 // CreateStmt createse SQL INSER statement
-func (c Common) CreateStmt(tableName string, columns []string, columnNames []string) (string, error) {
+func (c Common) CreateStmt(tableName string, columns string, columnNames string) (string, error) {
 
-	cols := strings.Join(columns, ",")
-	names := strings.Join(columnNames, ",")
-
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, cols, names)
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, columnNames)
 	return query, nil
 }

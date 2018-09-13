@@ -15,7 +15,10 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 		return err
 	}
 
-	stmt, err := c.Dialect.CreateStmt(m.TableName(), m.Columns(), m.ColumnNames())
+	cols := m.Columns()
+	cols.Remove(excludeColumns...)
+
+	stmt, err := c.Dialect.CreateStmt(m.TableName(), cols.String(), cols.ParamString())
 	if err != nil {
 		return errors.WithStack(err)
 	}
