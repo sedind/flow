@@ -20,7 +20,7 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 		return errors.WithStack(err)
 	}
 
-	Log(stmt)
+	Logger.Info(stmt)
 
 	res, err := c.Store.NamedExec(stmt, m.Value)
 	if err != nil {
