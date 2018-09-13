@@ -1,6 +1,8 @@
 package dbe
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/sedind/flow/validate"
 )
@@ -14,6 +16,9 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 	if err := m.beforeCreate(c); err != nil {
 		return err
 	}
+
+	m.TouchCreatedAt()
+	m.TouchUpdatedAt()
 
 	cols := m.Columns()
 	cols.Remove(excludeColumns...)
@@ -42,19 +47,71 @@ func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
 
 // Delete given model from database
 func (c *Connection) Delete(model interface{}) error {
-	//m := &Model{Value: model}
+	m := &Model{Value: model}
+
+	if err := m.beforeDelete(c); err != nil {
+		return err
+	}
+
+	stmt, err := c.Dialect.DeleteStmt(m.TableName(), m.WhereID())
+
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	Logger.Info(stmt)
+
+	_, err = c.Store.Exec(stmt)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if err := m.afterDelete(c); err != nil {
+		return err
+	}
 	return nil
 }
 
 // Save wraps the Create and Update methods. It executes a Create if no ID is provided with the entry;
 // or issues an Update otherwise.
 func (c *Connection) Save(model interface{}, excludeColumns ...string) error {
-	return nil
+	m := &Model{Value: model}
+	id := m.ID()
+	if fmt.Sprint(id) == "0" {
+		return c.Create(m.Value, excludeColumns...)
+	}
+	return c.Update(m.Value, excludeColumns...)
+
 }
 
 // Update given model to database
 func (c *Connection) Update(model interface{}, excludeColumns ...string) error {
-	return nil
+	m := &Model{Value: model}
+	if err := m.beforeUpdate(c); err != nil {
+		return err
+	}
+
+	cols := m.Columns()
+	cols.Remove("id", "created_at")
+	cols.Remove(excludeColumns...)
+
+	m.TouchUpdatedAt()
+
+	stmt, err := c.Dialect.UpdateStmt(m.TableName(), cols.UpdateString(), m.WhereID())
+
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	Logger.Info(stmt)
+
+	_, err = c.Store.NamedExec(stmt, m.Value)
+
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return m.afterUpdate(c)
 }
 
 // ValidateAndCreate applies validation rules on the given entry, then creates it

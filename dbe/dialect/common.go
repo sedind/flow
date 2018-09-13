@@ -21,3 +21,16 @@ func (c Common) CreateStmt(tableName string, columns string, columnNames string)
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, columnNames)
 	return query, nil
 }
+
+// UpdateStmt createse SQL INSER statement
+func (c Common) UpdateStmt(tableName string, columns string, where string) (string, error) {
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE %s", tableName, columns, where)
+	return query, nil
+}
+
+// DeleteStmt creates SQL DELETE statement
+func (c Common) DeleteStmt(tableName string, where string) (string, error) {
+	query := fmt.Sprintf("DELETE FROM %s WHERE %s", tableName, where)
+	return query, nil
+}

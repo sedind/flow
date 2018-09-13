@@ -9,6 +9,8 @@ import (
 type Dialect interface {
 	Name() string
 	CreateStmt(string, string, string) (string, error)
+	UpdateStmt(string, string, string) (string, error)
+	DeleteStmt(string, string) (string, error)
 }
 
 // list of registered dialects

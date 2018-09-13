@@ -98,3 +98,12 @@ func (c Columns) ParamString() string {
 	sort.Strings(cols)
 	return strings.Join(cols, ", ")
 }
+
+func (c Columns) UpdateString() string {
+	cols := []string{}
+	for _, c := range c.Cols {
+		cols = append(cols, c.UpdateString())
+	}
+	sort.Strings(cols)
+	return strings.Join(cols, ", ")
+}
