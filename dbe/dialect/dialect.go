@@ -11,6 +11,7 @@ type Dialect interface {
 	CreateStmt(string, string, string) (string, error)
 	UpdateStmt(string, string, string) (string, error)
 	DeleteStmt(string, string) (string, error)
+	TranslateSQL(string) string
 }
 
 // list of registered dialects

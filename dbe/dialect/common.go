@@ -34,3 +34,8 @@ func (c Common) DeleteStmt(tableName string, where string) (string, error) {
 	query := fmt.Sprintf("DELETE FROM %s WHERE %s", tableName, where)
 	return query, nil
 }
+
+// TranslateSQL to supported dialect
+func (c Common) TranslateSQL(sql string) string {
+	return sql
+}
