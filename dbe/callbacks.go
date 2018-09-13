@@ -26,12 +26,12 @@ func (m *Model) afterCreate(c *Connection) error {
 
 // BeforeDeleter callback will be called before record is deleted
 type BeforeDeleter interface {
-	AfterDelete(*Connection) error
+	BeforeDelete(*Connection) error
 }
 
 func (m *Model) beforeDelete(c *Connection) error {
 	if cm, ok := m.Value.(BeforeDeleter); ok {
-		return cm.AfterDelete(c)
+		return cm.BeforeDelete(c)
 	}
 	return nil
 }
