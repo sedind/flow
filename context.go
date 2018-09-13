@@ -22,11 +22,20 @@ type Context struct {
 }
 
 // DefaultConnection gets default DB Connection
-func (c *Context) DefaultConnection() *dbe.Connection {
+func (c *Context) DefaultConnection() (*dbe.Connection, error) {
 	if c, ok := c.DBConnections[c.Config.DefaultConnection]; ok {
-		return c
+		return c, nil
 	}
-	return nil
+	return nil, errors.New("Default connection not defined in configuration")
+}
+
+// Transaction returns new Transaction on Detault Database connection
+func (c *Context) Transaction() (*dbe.Connection, error) {
+	conn, err := c.DefaultConnection()
+	if err != nil {
+		return nil, err
+	}
+	return conn.NewTx()
 }
 
 // AppSetting gets appSetting string for given key

@@ -84,6 +84,22 @@ func (c *Connection) NewTx() (*Connection, error) {
 	return c, nil
 }
 
+// Rollback Transaction on connection
+func (c *Connection) Rollback() error {
+	if c.Tx != nil {
+		return c.Tx.Rollback()
+	}
+	return errors.New("Current connection does not have transaction")
+}
+
+// Commit Transaction on connection
+func (c *Connection) Commit() error {
+	if c.Tx != nil {
+		return c.Tx.Commit()
+	}
+	return errors.New("Current connection does not have transaction")
+}
+
 func (c *Connection) copy() *Connection {
 	return &Connection{
 		ID:      string(time.Now().Unix()),
