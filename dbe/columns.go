@@ -99,6 +99,7 @@ func (c Columns) ParamString() string {
 	return strings.Join(cols, ", ")
 }
 
+// UpdateString returns columns as update statements
 func (c Columns) UpdateString() string {
 	cols := []string{}
 	for _, c := range c.Cols {

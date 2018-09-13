@@ -117,17 +117,60 @@ func (c *Connection) Update(model interface{}, excludeColumns ...string) error {
 // ValidateAndCreate applies validation rules on the given entry, then creates it
 // if the validation succeed, excluding the given columns.
 func (c *Connection) ValidateAndCreate(model interface{}, excludeColumns ...string) (*validate.Errors, error) {
-	return nil, nil
+	m := &Model{Value: model}
+
+	verrs, err := m.validateCreate(c)
+	if err != nil {
+		return verrs, err
+	}
+
+	if verrs.HasAny() {
+		return verrs, nil
+	}
+
+	return verrs, c.Create(m, excludeColumns...)
 }
 
 // ValidateAndSave applies validation rules on the given entry, then save it
 // if the validation succeed, excluding the given columns.
 func (c *Connection) ValidateAndSave(model interface{}, excludeColumns ...string) (*validate.Errors, error) {
-	return nil, nil
+	m := &Model{Value: model}
+	id := m.ID()
+	if fmt.Sprint(id) == "0" {
+		return c.ValidateAndCreate(m.Value, excludeColumns...)
+	}
+	return c.ValidateAndUpdate(m.Value, excludeColumns...)
 }
 
 // ValidateAndUpdate applies validation rules on the given entry, then update it
 // if the validation succeed, excluding the given columns.
 func (c *Connection) ValidateAndUpdate(model interface{}, excludeColumns ...string) (*validate.Errors, error) {
-	return nil, nil
+	m := &Model{Value: model}
+
+	verrs, err := m.validateUpdate(c)
+	if err != nil {
+		return verrs, err
+	}
+
+	if verrs.HasAny() {
+		return verrs, nil
+	}
+
+	return verrs, c.Update(model, excludeColumns...)
+}
+
+// ValidateAndDelete applies validation rules on the given entry,
+// then delte it if the validation succeed.
+func (c *Connection) ValidateAndDelete(model interface{}) (*validate.Errors, error) {
+	m := &Model{Value: model}
+	verrs, err := m.validateDelete(c)
+	if err != nil {
+		return verrs, err
+	}
+
+	if verrs.HasAny() {
+		return verrs, nil
+	}
+
+	return verrs, c.Delete(model)
 }
