@@ -35,6 +35,12 @@ func (c Common) DeleteStmt(tableName string, where string) (string, error) {
 	return query, nil
 }
 
+// CountStmt creates SQL SELECT Count query for provided field
+func (c Common) CountStmt(field string, query string) (string, error) {
+	stmt := fmt.Sprintf("select count(%s) as row_count from (%s) a", field, query)
+	return stmt, nil
+}
+
 // TranslateSQL to supported dialect
 func (c Common) TranslateSQL(sql string) string {
 	return sql

@@ -25,7 +25,7 @@ type Query struct {
 	Connection    *Connection
 }
 
-// Query creates new "empty" query from the current connection.
+// Query Creates new Empty Query
 func (c *Connection) Query() *Query {
 	return NewQuery(c)
 }
