@@ -6,10 +6,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
 var (
+	// LoggerSkipPaths holds Request Paths that will not be logged in comma separated string
+	// this is usefull to ommit request logging a /healthcheck routes
+	LoggerSkipPaths = ""
 	// LogEntryCtxKey is the context.Context key to store the request log entry.
 	LogEntryCtxKey = &contextKey{"LogEntry"}
 
@@ -40,7 +44,9 @@ func RequestLogger(f LogFormatter) func(next http.Handler) http.Handler {
 
 			t1 := time.Now()
 			defer func() {
-				entry.Write(ww.Status(), ww.BytesWritten(), time.Since(t1))
+				if !strings.Contains(LoggerSkipPaths, r.RequestURI) {
+					entry.Write(ww.Status(), ww.BytesWritten(), time.Since(t1))
+				}
 			}()
 
 			next.ServeHTTP(ww, WithLogEntry(r, entry))
