@@ -128,7 +128,7 @@ func (c *Connection) ValidateAndCreate(model interface{}, excludeColumns ...stri
 		return verrs, nil
 	}
 
-	return verrs, c.Create(m, excludeColumns...)
+	return verrs, c.Create(m.Value, excludeColumns...)
 }
 
 // ValidateAndSave applies validation rules on the given entry, then save it
@@ -156,7 +156,7 @@ func (c *Connection) ValidateAndUpdate(model interface{}, excludeColumns ...stri
 		return verrs, nil
 	}
 
-	return verrs, c.Update(model, excludeColumns...)
+	return verrs, c.Update(m.Value, excludeColumns...)
 }
 
 // ValidateAndDelete applies validation rules on the given entry,
@@ -172,5 +172,5 @@ func (c *Connection) ValidateAndDelete(model interface{}) (*validate.Errors, err
 		return verrs, nil
 	}
 
-	return verrs, c.Delete(model)
+	return verrs, c.Delete(m.Value)
 }
