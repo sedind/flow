@@ -79,7 +79,7 @@ func (q *Query) All(models interface{}) error {
 	m := &Model{Value: models}
 	sql, args := q.ToSQL(m)
 	Logger.Info(fmt.Sprintf("%s | %s", sql, args))
-	err := q.Connection.Store.Get(m.Value, sql, args...)
+	err := q.Connection.Store.Select(m.Value, sql, args...)
 	if err == nil && q.Paginator != nil {
 		ct, err := q.Count(models)
 		if err == nil {
