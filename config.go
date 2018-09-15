@@ -14,6 +14,7 @@ type Config struct {
 	RedirectSlashes   bool                    `yaml:"redirect_slashes"`
 	PanicRecover      bool                    `yaml:"panic_recover"`
 	NoCache           bool                    `yaml:"no_cache"`
+	JWTAuth           bool                    `yaml:"jwt_auth"`
 	CORS              CORSConfig              `yaml:"cors"`
 	MigrationsPath    string                  `yaml:"migrations_path"`
 	DefaultConnection string                  `yaml:"default_connection"`

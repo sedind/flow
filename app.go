@@ -9,6 +9,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/sedind/flow/auth/jwtauth"
+
 	"github.com/sedind/flow/dotenv"
 
 	"github.com/pkg/errors"
@@ -56,11 +58,30 @@ func New(configFile string) *App {
 		connections[k] = c
 	}
 
+	var auth *jwtauth.JWTAuth
+
+	if appConfig.JWTAuth {
+		secret, ok := appConfig.AppSettings["jwt_secret"]
+		if !ok {
+			panic(errors.New("jwt_secret key not provided in app_settings"))
+		}
+
+		alg, ok := appConfig.AppSettings["jwt_algorithm"]
+		if !ok {
+			appLogger.Warn("jwt_algorithm key not provided in app_settings, HS256 algorithm will be used")
+			alg = "HS256"
+		}
+
+		auth = jwtauth.New(alg, []byte(secret), nil)
+
+	}
+
 	// create application context object
 	ctx := Context{
-		appConfig,
-		connections,
-		appLogger,
+		Config:        appConfig,
+		DBConnections: connections,
+		Logger:        appLogger,
+		jwtauth:       auth,
 	}
 
 	return &App{

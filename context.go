@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/sedind/flow/auth/jwtauth"
 	"github.com/sedind/flow/dbe"
 	"github.com/sedind/flow/logger"
 )
@@ -19,6 +20,12 @@ type Context struct {
 	Config
 	DBConnections map[string]*dbe.Connection
 	Logger        logger.Logger
+	jwtauth       *jwtauth.JWTAuth
+}
+
+// JWTAuth gets JWTAuth object
+func (c *Context) JWTAuth() *jwtauth.JWTAuth {
+	return c.jwtauth
 }
 
 // DefaultConnection gets default DB Connection
