@@ -110,10 +110,11 @@ func (m *Model) Columns() Columns {
 	names := []string{}
 
 	t := reflect.TypeOf(m.Value)
-	if t.Kind() == reflect.Slice || t.Kind() == reflect.Array {
+
+	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Slice {
 		t = t.Elem()
 		if t.Kind() == reflect.Ptr {
 			t = t.Elem()
