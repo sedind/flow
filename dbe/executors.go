@@ -7,6 +7,11 @@ import (
 	"github.com/sedind/flow/validate"
 )
 
+// Select executes provided query and maps result to provided model object
+func (c *Connection) Select(model interface{}, sql string, args ...string) error {
+	return c.Store.Select(model, sql, args)
+}
+
 // Create add a new given entry to the database, excluding the given columns.
 // It updates `created_at` and `updated_at` columns automatically.
 func (c *Connection) Create(model interface{}, excludeColumns ...string) error {
