@@ -163,6 +163,11 @@ func (ja *JWTAuth) Decode(tokenString string) (t *jwt.Token, err error) {
 	return
 }
 
+// FromContext gets token and claims from request
+func (ja *JWTAuth) FromContext(ctx context.Context) (*jwt.Token, Claims, error) {
+	return FromContext(ctx)
+}
+
 func (ja *JWTAuth) keyFunc(t *jwt.Token) (interface{}, error) {
 	if ja.verifyKey != nil {
 		return ja.verifyKey, nil
