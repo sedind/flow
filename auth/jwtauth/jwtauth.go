@@ -18,6 +18,12 @@ var (
 
 	// ErrorCtxKey context key for error
 	ErrorCtxKey = &contextKey{"JWTError"}
+
+	// UserIDClaim name key for getting userId from token
+	UserIDClaim = "user_id"
+
+	// UserScopeClaim name key for getting scope from token
+	UserScopeClaim = "scope"
 )
 
 var (
@@ -340,6 +346,32 @@ func TokenFromHeader(r *http.Request) string {
 func TokenFromQuery(r *http.Request) string {
 	// Get token from query param named "jwt".
 	return r.URL.Query().Get("jwt")
+}
+
+// UserID gets `user_id` claim from jwt token
+func UserID(r *http.Request) (interface{}, bool) {
+	_, claims, err := FromContext(r.Context())
+	if err != nil {
+		return nil, false
+	}
+
+	return claims.Get(UserIDClaim)
+}
+
+// UserScope gets `scope` claim from jwt token
+func UserScope(r *http.Request) (interface{}, bool) {
+	_, claims, err := FromContext(r.Context())
+	if err != nil {
+		return nil, false
+	}
+
+	return claims.Get(UserScopeClaim)
+}
+
+// UserClaims gets claims from jwt token
+func UserClaims(r *http.Request) (Claims, error) {
+	_, claims, err := FromContext(r.Context())
+	return claims, err
 }
 
 // contextKey is a value for use with context.WithValue. It's used as
