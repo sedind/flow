@@ -197,6 +197,13 @@ func (ja *JWTAuth) HasScopeValue(r *http.Request, val string) bool {
 	case []string:
 		vs := strings.Join(v, ",")
 		return strings.Contains(vs, val)
+	case []interface{}:
+		s := make([]string, len(v))
+		for i, vs := range v {
+			s[i] = fmt.Sprint(vs)
+		}
+		vs := strings.Join(s, ",")
+		return strings.Contains(vs, val)
 	default:
 		return false
 	}
