@@ -184,6 +184,24 @@ func (ja *JWTAuth) UserScope(r *http.Request) (interface{}, bool) {
 	return UserScope(r)
 }
 
+// HasScopeValue verifies if  `scope` claim from jwt token
+// containes given value
+func (ja *JWTAuth) HasScopeValue(r *http.Request, val string) bool {
+	scope, ok := UserScope(r)
+	if !ok {
+		return false
+	}
+	switch v := scope.(type) {
+	case string:
+		return strings.Contains(v, val)
+	case []string:
+		vs := strings.Join(v, ",")
+		return strings.Contains(vs, val)
+	default:
+		return false
+	}
+}
+
 // UserClaims gets claims from jwt token
 func (ja *JWTAuth) UserClaims(r *http.Request) (Claims, error) {
 	return UserClaims(r)
