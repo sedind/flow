@@ -174,6 +174,21 @@ func (ja *JWTAuth) FromContext(ctx context.Context) (*jwt.Token, Claims, error) 
 	return FromContext(ctx)
 }
 
+// UserID gets `user_id` claim from jwt token
+func (ja *JWTAuth) UserID(r *http.Request) (interface{}, bool) {
+	return UserID(r)
+}
+
+// UserScope gets `scope` claim from jwt token
+func (ja *JWTAuth) UserScope(r *http.Request) (interface{}, bool) {
+	return UserScope(r)
+}
+
+// UserClaims gets claims from jwt token
+func (ja *JWTAuth) UserClaims(r *http.Request) (Claims, error) {
+	return UserClaims(r)
+}
+
 func (ja *JWTAuth) keyFunc(t *jwt.Token) (interface{}, error) {
 	if ja.verifyKey != nil {
 		return ja.verifyKey, nil
