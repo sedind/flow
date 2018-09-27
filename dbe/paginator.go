@@ -40,7 +40,7 @@ func NewPaginator(page int, perPage int) *Paginator {
 		page = 1
 	}
 	if perPage < 1 {
-		perPage = 20
+		perPage = PaginatorPerPageDefault
 	}
 	p := &Paginator{Page: page, PerPage: perPage}
 	p.Offset = (page - 1) * p.PerPage
