@@ -56,7 +56,7 @@ func RegisterMethod(method string) {
 	}
 	n := len(methodMap)
 	if n > strconv.IntSize {
-		panic(fmt.Sprintf("chi: max number of methods reached (%d)", strconv.IntSize))
+		panic(fmt.Sprintf("router: max number of methods reached (%d)", strconv.IntSize))
 	}
 	mt := methodTyp(math.Exp2(float64(n)))
 	methodMap[method] = mt
@@ -242,7 +242,7 @@ func (n *node) addChild(child *node, prefix string) *node {
 		if segTyp == ntRegexp {
 			rex, err := regexp.Compile(segRexpat)
 			if err != nil {
-				panic(fmt.Sprintf("chi: invalid regexp pattern '%s' in route param", segRexpat))
+				panic(fmt.Sprintf("router: invalid regexp pattern '%s' in route param", segRexpat))
 			}
 			child.prefix = segRexpat
 			child.rex = rex
@@ -312,7 +312,7 @@ func (n *node) replaceChild(label, tail byte, child *node) {
 			return
 		}
 	}
-	panic("chi: replacing missing child")
+	panic("router: replacing missing child")
 }
 
 func (n *node) getEdge(ntyp nodeTyp, label, tail byte, prefix string) *node {

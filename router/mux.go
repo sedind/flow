@@ -261,12 +261,12 @@ func (mx *Mux) Route(pattern string, fn func(r Router)) Router {
 	return subRouter
 }
 
-// Mount attaches another http.Handler or  Router as a subrouter along a routing
+// Mount attaches another http.Handler or chi Router as a subrouter along a routing
 // path. It's very useful to split up a large API as many independent routers and
 // compose them as a single service using Mount. See _examples/.
 //
 // Note that Mount() simply sets a wildcard along the `pattern` that will continue
-// routing at the `handler`, which in most cases is another Router. As a result,
+// routing at the `handler`, which in most cases is another chi.Router. As a result,
 // if you define two Mount() routes on the exact same pattern the mount will panic.
 func (mx *Mux) Mount(pattern string, handler http.Handler) {
 	// Provide runtime safety for ensuring a pattern isn't mounted on an existing
@@ -409,12 +409,11 @@ func (mx *Mux) routeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Check if method is supported by router
+	// Check if method is supported by chi
 	if rctx.RouteMethod == "" {
 		rctx.RouteMethod = r.Method
 	}
 	method, ok := methodMap[rctx.RouteMethod]
-
 	if !ok {
 		mx.MethodNotAllowedHandler().ServeHTTP(w, r)
 		return
@@ -455,7 +454,6 @@ func (mx *Mux) updateSubRoutes(fn func(subMux *Mux)) {
 // methodNotAllowedHandler is a helper function to respond with a 405,
 // method not allowed.
 func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("NOT Allowed method triggered")
 	w.WriteHeader(405)
 	w.Write(nil)
 }

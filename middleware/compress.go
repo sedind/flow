@@ -188,7 +188,7 @@ func (w *maybeCompressResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, err
 	if hj, ok := w.w.(http.Hijacker); ok {
 		return hj.Hijack()
 	}
-	return nil, nil, errors.New("chi/middleware: http.Hijacker is unavailable on the writer")
+	return nil, nil, errors.New("router/middleware: http.Hijacker is unavailable on the writer")
 }
 
 func (w *maybeCompressResponseWriter) CloseNotify() <-chan bool {
