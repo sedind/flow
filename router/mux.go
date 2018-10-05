@@ -455,6 +455,7 @@ func (mx *Mux) updateSubRoutes(fn func(subMux *Mux)) {
 // methodNotAllowedHandler is a helper function to respond with a 405,
 // method not allowed.
 func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("NOT Allowed method triggered")
 	w.WriteHeader(405)
 	w.Write(nil)
 }
