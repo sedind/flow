@@ -414,6 +414,9 @@ func (mx *Mux) routeHTTP(w http.ResponseWriter, r *http.Request) {
 		rctx.RouteMethod = r.Method
 	}
 	method, ok := methodMap[rctx.RouteMethod]
+
+	fmt.Printf("Method: %#v, Path:%s ", method, routePath)
+
 	if !ok {
 		mx.MethodNotAllowedHandler().ServeHTTP(w, r)
 		return
