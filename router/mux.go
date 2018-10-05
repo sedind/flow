@@ -60,7 +60,7 @@ func NewMux() *Mux {
 func (mx *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Ensure the mux has some routes defined on the mux
 	if mx.handler == nil {
-		panic("chi: attempting to route to a mux with no handlers.")
+		panic("router: attempting to route to a mux with no handlers.")
 	}
 
 	// Check if a routing context already exists from a parent router.
@@ -90,7 +90,7 @@ func (mx *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // the next http.Handler.
 func (mx *Mux) Use(middlewares ...func(http.Handler) http.Handler) {
 	if mx.handler != nil {
-		panic("chi: all middlewares must be defined before routes on a mux")
+		panic("router: all middlewares must be defined before routes on a mux")
 	}
 	mx.middlewares = append(mx.middlewares, middlewares...)
 }
@@ -112,7 +112,7 @@ func (mx *Mux) HandleFunc(pattern string, handlerFn http.HandlerFunc) {
 func (mx *Mux) Method(method, pattern string, handler http.Handler) {
 	m, ok := methodMap[strings.ToUpper(method)]
 	if !ok {
-		panic(fmt.Sprintf("chi: '%s' http method is not supported.", method))
+		panic(fmt.Sprintf("router: '%s' http method is not supported.", method))
 	}
 	mx.handle(m, pattern, handler)
 }
@@ -261,18 +261,18 @@ func (mx *Mux) Route(pattern string, fn func(r Router)) Router {
 	return subRouter
 }
 
-// Mount attaches another http.Handler or chi Router as a subrouter along a routing
+// Mount attaches another http.Handler or  Router as a subrouter along a routing
 // path. It's very useful to split up a large API as many independent routers and
 // compose them as a single service using Mount. See _examples/.
 //
 // Note that Mount() simply sets a wildcard along the `pattern` that will continue
-// routing at the `handler`, which in most cases is another chi.Router. As a result,
+// routing at the `handler`, which in most cases is another Router. As a result,
 // if you define two Mount() routes on the exact same pattern the mount will panic.
 func (mx *Mux) Mount(pattern string, handler http.Handler) {
 	// Provide runtime safety for ensuring a pattern isn't mounted on an existing
 	// routing pattern.
 	if mx.tree.findPattern(pattern+"*") || mx.tree.findPattern(pattern+"/*") {
-		panic(fmt.Sprintf("chi: attempting to Mount() a handler on an existing path, '%s'", pattern))
+		panic(fmt.Sprintf("router: attempting to Mount() a handler on an existing path, '%s'", pattern))
 	}
 
 	// Assign sub-Router's with the parent not found & method not allowed handler if not specified.
@@ -372,7 +372,7 @@ func (mx *Mux) buildRouteHandler() {
 // and routing pattern.
 func (mx *Mux) handle(method methodTyp, pattern string, handler http.Handler) *node {
 	if len(pattern) == 0 || pattern[0] != '/' {
-		panic(fmt.Sprintf("chi: routing pattern must begin with '/' in '%s'", pattern))
+		panic(fmt.Sprintf("router: routing pattern must begin with '/' in '%s'", pattern))
 	}
 
 	// Build the final routing handler for this Mux.
@@ -409,7 +409,7 @@ func (mx *Mux) routeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Check if method is supported by chi
+	// Check if method is supported by router
 	if rctx.RouteMethod == "" {
 		rctx.RouteMethod = r.Method
 	}

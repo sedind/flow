@@ -560,7 +560,7 @@ func (n *node) findPattern(pattern string) bool {
 			idx = longestPrefix(pattern, "*")
 
 		default:
-			panic("chi: unknown node type")
+			panic("router: unknown node type")
 		}
 
 		xpattern = pattern[idx:]
@@ -652,7 +652,7 @@ func patNextSegment(pattern string) (nodeTyp, string, string, byte, int, int) {
 
 	// Sanity check
 	if ps >= 0 && ws >= 0 && ws < ps {
-		panic("chi: wildcard '*' must be the last pattern in a route, otherwise use a '{param}'")
+		panic("router: wildcard '*' must be the last pattern in a route, otherwise use a '{param}'")
 	}
 
 	var tail byte = '/' // Default endpoint tail to / byte
@@ -676,7 +676,7 @@ func patNextSegment(pattern string) (nodeTyp, string, string, byte, int, int) {
 			}
 		}
 		if pe == ps {
-			panic("chi: route param closing delimiter '}' is missing")
+			panic("router: route param closing delimiter '}' is missing")
 		}
 
 		key := pattern[ps+1 : pe]
@@ -720,7 +720,7 @@ func patParamKeys(pattern string) []string {
 		}
 		for i := 0; i < len(paramKeys); i++ {
 			if paramKeys[i] == paramKey {
-				panic(fmt.Sprintf("chi: routing pattern '%s' contains duplicate param key, '%s'", pattern, paramKey))
+				panic(fmt.Sprintf("router: routing pattern '%s' contains duplicate param key, '%s'", pattern, paramKey))
 			}
 		}
 		paramKeys = append(paramKeys, paramKey)
