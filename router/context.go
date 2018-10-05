@@ -2,30 +2,34 @@ package router
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"strings"
 )
 
 var (
+	// RouteCtxKey is the context.Context key to store the request context.
 	RouteCtxKey = &contextKey{"RouteContext"}
 )
 
-// Context is set on the root node of a request context to track route patterns,
-// URL parametes and an optional routing path
+// Context is the default routing context set on the root node of a
+// request context to track route patterns, URL parameters and
+// an optional routing path.
 type Context struct {
 	Routes Routes
 
-	// Routing path/method override used during the route search
+	// Routing path/method override used during the route search.
+	// See Mux#routeHTTP method.
 	RoutePath   string
 	RouteMethod string
 
-	// Routing pattern stack through the lifecycle of the request,
+	// Routing pattern stack throughout the lifecycle of the request,
 	// across all connected routers. It is a record of all matching
-	// patterns across a stack of sub-routes
+	// patterns across a stack of sub-routers.
 	RoutePatterns []string
 
-	// URLParams are the stack of routeParams captured during
-	// the routing lifecycle across a stack of sub-routes
+	// URLParams are the stack of routeParams captured during the
+	// routing lifecycle across a stack of sub-routers.
 	URLParams RouteParams
 
 	// The endpoint routing pattern that matched the request URI path
@@ -38,11 +42,12 @@ type Context struct {
 	// intentionally unexported so it cant be tampered.
 	routeParams RouteParams
 
+	// methodNotAllowed hint
 	methodNotAllowed bool
 }
 
-// NewContext returns new Routing Context object
-func NewContext() *Context {
+// NewRouteContext returns new Routing Context object
+func NewRouteContext() *Context {
 	return &Context{}
 }
 
@@ -54,6 +59,7 @@ func (c *Context) Reset() {
 	c.RoutePatterns = c.RoutePatterns[:0]
 	c.URLParams.Keys = c.URLParams.Keys[:0]
 	c.URLParams.Values = c.URLParams.Values[:0]
+
 	c.routePattern = ""
 	c.routeParams.Keys = c.routeParams.Keys[:0]
 	c.routeParams.Values = c.routeParams.Values[:0]
@@ -100,6 +106,26 @@ func URLParamFromCtx(ctx context.Context, key string) string {
 		return rctx.URLParam(key)
 	}
 	return ""
+}
+
+// ServerBaseContext wraps an http.Handler to set the request context to the
+// `baseCtx`.
+func ServerBaseContext(baseCtx context.Context, h http.Handler) http.Handler {
+	fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		baseCtx := baseCtx
+
+		// Copy over default net/http server context keys
+		if v, ok := ctx.Value(http.ServerContextKey).(*http.Server); ok {
+			baseCtx = context.WithValue(baseCtx, http.ServerContextKey, v)
+		}
+		if v, ok := ctx.Value(http.LocalAddrContextKey).(net.Addr); ok {
+			baseCtx = context.WithValue(baseCtx, http.LocalAddrContextKey, v)
+		}
+
+		h.ServeHTTP(w, r.WithContext(baseCtx))
+	})
+	return fn
 }
 
 // contextKey is a value for use with context.WithValue.
